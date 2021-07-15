@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="">
+  <head>
+    <script>
+      const { ipcRenderer } = require("electron");
+      const worker = require("./worker/index");
+      ipcRenderer.on("message-from-main", (event, arg) => {
+        console.info("arg", arg);
+        if (worker[arg.action]) {
+          worker[arg.action](arg.data);
+        }
+      });
+    </script>
+  </head>
+
+  <body>
+    <div id="wordRef"></div>
+  </body>
+</html>

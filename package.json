@@ -1,0 +1,63 @@
+{
+  "name": "electron-vue-anticipatory",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "serve": "vue-cli-service serve",
+    "build": "vue-cli-service build",
+    "build:app": "vue-cli-service electron:build",
+    "build:win": "npm run electron:build:win",
+    "dev": "vue-cli-service electron:serve",
+    "electron:build": "vue-cli-service electron:build --win",
+    "electron:build:win": "vue-cli-service electron:build --windows --x64",
+    "electron:serve": "vue-cli-service electron:serve",
+    "postinstall": "electron-builder install-app-deps",
+    "postuninstall": "electron-builder install-app-deps"
+  },
+  "main": "background.js",
+  "dependencies": {
+    "ant-design-vue": "^1.7.5",
+    "axios": "^0.21.1",
+    "codemirror": "^5.62.0",
+    "codemirror-revisedsearch": "^1.0.12",
+    "core-js": "^3.6.5",
+    "dingbat-to-unicode": "^1.0.1",
+    "electron-find": "^1.0.6",
+    "fast-xml-parser": "^3.19.0",
+    "fs-extra": "^8.1.0",
+    "jschardet": "^3.0.0",
+    "jszip": "^2.5.0",
+    "lop": "^0.4.1",
+    "lowdb": "^1.0.0",
+    "moment": "^2.29.1",
+    "node-xlsx": "^0.16.1",
+    "officegen": "^0.6.5",
+    "readable-stream": "^2.0.0",
+    "require": "^2.4.20",
+    "requirejs": "^2.3.6",
+    "stream": "0.0.2",
+    "underscore": "^1.13.1",
+    "uuid": "^8.3.2",
+    "vue": "^2.6.11",
+    "vue-router": "^3.2.0",
+    "vuex": "^3.4.0",
+    "xml2js": "^0.4.23"
+  },
+  "devDependencies": {
+    "@vue/cli-plugin-babel": "~4.5.0",
+    "@vue/cli-plugin-router": "~4.5.0",
+    "@vue/cli-plugin-vuex": "~4.5.0",
+    "@vue/cli-service": "~4.5.0",
+    "electron": "^13.0.0",
+    "electron-devtools-installer": "^3.1.0",
+    "node-sass": "^4.12.0",
+    "sass-loader": "^8.0.2",
+    "vue-cli-plugin-electron-builder": "~2.1.1",
+    "vue-template-compiler": "^2.6.11"
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not dead"
+  ]
+}
