@@ -1543,9 +1543,9 @@ export default {
         const result = ary.map((item) => {
           if (item) {
             if (type == 0) {
-              item = "@" + item;
+              item = this.exportConfig.insert.before + item;
             } else {
-              item = item + "!";
+              item = item + this.exportConfig.insert.after;
             }
           }
           return item;

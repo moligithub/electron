@@ -200,14 +200,15 @@ export default class ExportService {
       "target-lang": [],
     };
     result.content = aryRef.map((item, index) => {
-      if (["txt", "docx"].includes(config.suffix)) {
-        if (config.insert.before) {
-          item = config.insert.before + item;
-        }
-        if (config.insert.after) {
-          item = item + config.insert.after;
-        }
-      }
+      // 手动插入
+      // if (["txt", "docx"].includes(config.suffix)) {
+      //   if (config.insert.before) {
+      //     item = config.insert.before + item;
+      //   }
+      //   if (config.insert.after) {
+      //     item = item + config.insert.after;
+      //   }
+      // }
       if (index % 2 === 0) {
         result.source.push(item);
       } else {
