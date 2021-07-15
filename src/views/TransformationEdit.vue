@@ -274,7 +274,7 @@
           </div>
           <div
             v-if="['txt', 'docx'].includes(exportConfig.suffix)"
-            style="width: 220px"
+            style="width: 320px"
             class="setting-group"
           >
             <div class="setting-group-title">插入：</div>
@@ -288,6 +288,7 @@
                     v-model="exportConfig.insert.before"
                   ></a-input>
                 </div>
+                <a-button type="defalut" class="primary-btn" @click="insertEnter(0)">插入</a-button>
               </div>
               <div style="margin-top: 15px" class="input-group">
                 <div class="input-title">段尾</div>
@@ -298,6 +299,7 @@
                     v-model="exportConfig.insert.after"
                   ></a-input>
                 </div>
+                <a-button type="defalut" class="primary-btn" @click="insertEnter(1)">插入</a-button>
               </div>
             </div>
           </div>
@@ -1877,6 +1879,16 @@ export default {
         }
         .setting-group-value {
           flex: 1;
+          .primary-btn {
+            margin-left: 20px;
+            width: 82px;
+            height: 32px;
+            border-radius: 4px;
+            color: rgba(1, 171, 240, 100);
+            font-size: 14px;
+            text-align: center;
+            border: 1px solid rgba(1, 171, 240, 100);
+          }
         }
       }
     }
