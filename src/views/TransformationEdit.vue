@@ -108,12 +108,17 @@
       @close="onClose"
     >
       
+     <div style="position:relative;z-index:9999;margin-right:-8px;text-align:center;color:#0093FF;float:right;writing-mode:tb-rl;width: 0px;height: 100%;text-align: center;" 
+         :style="{ visibility: drawer.visible0 ? 'hidden' : 'visible' }"
+      class="buttom-option-name"> 基本操作</div>
+
     </a-drawer> -->
     <div v-if="panes.length > 0" class="drawer-class drawer-top-class">
       <div class="icon-close icon-close-top" @click="showDrawer(0)">
         <a-icon v-if="drawer.visible0" type="right" />
         <a-icon v-else type="left" />
       </div>
+      
       <div
         :style="{ width: drawer.visible0 ? '130px' : '0px' }"
         class="handle-texts"
@@ -197,11 +202,14 @@
         <a-icon v-if="drawer.visible1" type="down" />
         <a-icon v-else type="up" />
       </div>
+       <div style="margin:-10px;text-align:center;color:#0093FF;" 
+          :style="{ visibility: drawer.visible1 ? 'hidden' : 'visible' }"
+      class="buttom-option-name"> 高级操作</div>
       <div
-        :style="{ height: drawer.visible1 ? '150px' : '0px' }"
+        :style="{ height: drawer.visible1 ? '120px' : '0px' }"
         class="setting"
       >
-        <div class="setting-title">高级</div>
+        <div class="setting-title"></div>
         <div class="setting-body">
           <div class="setting-group">
             <div class="setting-group-title">格式设置：</div>
@@ -671,10 +679,10 @@ export default {
       if (!this.activeKey) {
         return;
       }
-      if (timer) {
-        clearTimeout(timer);
-      }
-      timer = setTimeout(() => {
+      // if (timer) {
+      //   clearTimeout(timer);
+      // }
+      // timer = setTimeout(() => {
         const pane = this.panes.find((d) => d.key == this.activeKey);
         if (
           [
@@ -722,7 +730,7 @@ export default {
           this.addModal.visible = true;
           this.addModal.placeholder = pane.title;
         }
-      }, 200);
+      // }, 200);
     });
   },
   mounted() {

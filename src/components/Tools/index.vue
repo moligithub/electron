@@ -18,7 +18,7 @@
       <div class="quit" @click.stop="quitClick()">退出</div>
     </div>
     <div class="user" v-else>
-      <div @click="login()">账户登录</div>
+      <div @click="login()">登录</div>
       <div @click="register()">注册</div>
     </div>
 
@@ -31,7 +31,7 @@
       <a-modal v-model="visible" title="登录" :footer="null" @cancel="close">
         <a-form-model ref="ruleForm" :model="ruleForm" :rules="rules" v-bind="layout">
           <a-form-model-item has-feedback label="用户名" prop="name">
-            <a-input v-model="ruleForm.name" placeholder="请输入用户名/手机号" autocomplete="off" />
+            <a-input v-model="ruleForm.name" placeholder="请输入用户名" autocomplete="off" />
           </a-form-model-item>
           <a-form-model-item has-feedback label="密码" prop="pwd">
             <a-input v-model="ruleForm.pwd" placeholder="请输入密码" type="password" autocomplete="off" />

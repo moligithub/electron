@@ -368,6 +368,10 @@ export default {
     },
     exportFunc(exportConfig, content, file) {
       this.$ipcRenderer.send("timer.refresh");
+      if(exportConfig.suffix=='xlsx'){
+        exportConfig.separate='';
+         console.log(exportConfig)
+      }
       switch (exportConfig.suffix) {
         case "tmx":
           exportService
@@ -512,7 +516,11 @@ export default {
     exportClick() {
       // this.exportOk();
       this.$ipcRenderer.send("timer.refresh");
-      if (this.exportConfig.separate.character) {
+      let character=this.exportConfig.separate.character;
+      if(this.exportConfig.suffix=='xlsx'){
+         character='';
+      }
+      if (character) {
         const result = this.transformationFile.data.map(item => {
           return item.join(this.exportConfig.separate.character);
         });

@@ -7,7 +7,7 @@ const isDevelopment = process.env.NODE_ENV !== "production";
 protocol.registerSchemesAsPrivileged([
   { scheme: "app", privileges: { secure: true, standard: true } },
 ]);
-function createMenu() {
+function createMenu () {
   // darwin表示macOS，针对macOS的设置
   if (process.platform === "darwin") {
     const template = [
@@ -29,7 +29,6 @@ function createMenu() {
           { label: "粘贴", accelerator: "CmdOrCtrl+V", selector: "paste:" },
           { label: "剪切", accelerator: "CmdOrCtrl+X", selector: "cut:" },
           { label: "全选", accelerator: "CmdOrCtrl+A", selector: "selectAll:" },
-          { label: "全选", accelerator: "CmdOrCtrl+A", selector: "selectAll:" },
         ],
       },
     ];
@@ -42,7 +41,7 @@ function createMenu() {
 }
 let win = null;
 let workerWindow = null;
-async function createWindow() {
+async function createWindow () {
   // Create the browser window.
   win = new BrowserWindow({
     width: 1200,
@@ -96,16 +95,16 @@ async function createWindow() {
   } else {
     await workerWindow.loadURL("app://./index.html");
   }
-
+  win.on('closed', () => {
+    app.quit();
+  })
   // workerWindow.webContents.openDevTools();
 }
 // Quit when all windows are closed.
 app.on("window-all-closed", () => {
   // On macOS it is common for applications and their menu bar
   // to stay active until the user quits explicitly with Cmd + Q
-  if (process.platform !== "darwin") {
-    app.quit();
-  }
+  app.quit();
 });
 
 app.on("activate", () => {
@@ -143,26 +142,41 @@ app.on("ready", async () => {
   //   });
   // }, 2000);
 });
-function sendWindowMessage(targetWindow, message, payload) {
+function sendWindowMessage (targetWindow, message, payload) {
   if (typeof targetWindow === "undefined") {
     console.log("Target window does not exist");
     return;
   }
-  if (targetWindow.webContents) {
+  if (targetWindow && targetWindow.webContents) {
     targetWindow.webContents.send(message, payload);
   }
+}
+const gotTheLock = app.requestSingleInstanceLock();
+if (!gotTheLock) {
+  app.exit();
+} else {
+  app.on('second-instance', (event, commandLine, workingDirectory) => {
+    // Someone tried to run a second instance, we should focus our window.
+    if (win) {
+      if (win.isMinimized()) win.restore()
+      win.focus()
+    }
+  })
+  // Create myWindow, load the rest of the app, etc...
+  app.on('ready', () => {
+  })
 }
 // Exit cleanly on request from parent process in development mode.
 if (isDevelopment) {
   if (process.platform === "win32") {
     process.on("message", (data) => {
       if (data === "graceful-exit") {
-        app.quit();
+        app.exit();
       }
     });
   } else {
     process.on("SIGTERM", () => {
-      app.quit();
+      app.exit();
     });
   }
 }
