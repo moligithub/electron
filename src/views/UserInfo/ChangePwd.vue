@@ -62,7 +62,7 @@ export default {
       },
       rules: {
         pass: [{ validator: validatePass, trigger: "blur" }],
-        checkPass: [{ validator: validatePass2, trigger: "change" }],
+        checkPass: [{ validator: validatePass2, trigger: "blur" }],
         oldPass: [{ validator: validateOldPass, trigger: "change" }]
       },
       layout: {
@@ -85,6 +85,10 @@ export default {
             newPassword: this.ruleForm.pass,
             oldPassword: this.ruleForm.oldPass
           };
+          if(this.ruleForm.pass==this.ruleForm.oldPass){
+            this.$message.error("新密码和原始密码相同，请修改");
+            return;
+          }
           this.$axios
             .post(`${baseHref}/user/updatePassword`, param, {
               headers: { token: token }

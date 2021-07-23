@@ -11,7 +11,9 @@
           <a-button type="link" @click="goRecord()">查看转换记录</a-button>
         </div>
       </div>
-      <button id="myFile" ref="myFile" @click="openSelectFile">UpdateFile</button>
+      <button id="myFile" ref="myFile" @click="openSelectFile">
+        UpdateFile
+      </button>
       <div @click="clickButtonFile(0)" class="upload-container">
         <div class="icon">
           <img src="../assets/images/uploadSingle.svg" alt />
@@ -36,12 +38,19 @@
         >
       </div>-->
     </div>
-    <div v-if="isStartTransformation && type === 0" class="transformation-start">
+    <div
+      v-if="isStartTransformation && type === 0"
+      class="transformation-start"
+    >
       <div class="transformation-title">{{ transformationFile.title }}</div>
       <div class="transformation-params">
         <div class="params-group">
           <span>导出格式：</span>
-          <a-select v-model="exportConfig.suffix" style="width: 100%" placeholder="请选择文件保存格式">
+          <a-select
+            v-model="exportConfig.suffix"
+            style="width: 100%"
+            placeholder="请选择文件保存格式"
+          >
             <a-select-option value="txt">TXT</a-select-option>
             <a-select-option value="tmx">TMX</a-select-option>
             <a-select-option value="tbx">TBX</a-select-option>
@@ -52,9 +61,15 @@
         </div>
         <div class="params-group">
           <span>文件编码：</span>
-          <a-select v-model="exportConfig.format" style="width: 100%" placeholder="请选择编码格式">
+          <a-select
+            v-model="exportConfig.format"
+            style="width: 100%"
+            placeholder="请选择编码格式"
+          >
             <a-select-option value="utf8">utf-8</a-select-option>
             <a-select-option value="GBK">gbk</a-select-option>
+            <a-select-option value="gb2312">gb2312</a-select-option>
+            <a-select-option value="gb18030">gb18030</a-select-option>
           </a-select>
         </div>
         <div class="params-group">
@@ -68,23 +83,33 @@
       </div>
       <div class="transformation-content">
         <template v-if="['txt', 'docx'].includes(exportConfig.suffix)">
-          <div v-for="(item, index) in transformationFile.data" :key="index" class="p">
-            <template
-              v-if="exportConfig.separate.character"
-            >{{ item[0] + exportConfig.separate.character + item[1] }}</template>
+          <div
+            v-for="(item, index) in transformationFile.data"
+            :key="index"
+            class="p"
+          >
+            <template v-if="exportConfig.separate.character">{{
+              item[0] + exportConfig.separate.character + item[1]
+            }}</template>
             <template v-else>
               <div>{{ item[0] }}</div>
               <div>{{ item[1] }}</div>
             </template>
           </div>
         </template>
-        <template v-if="['xlsx', 'tmx', 'tbx', 'xliff'].includes(exportConfig.suffix)">
+        <template
+          v-if="['xlsx', 'tmx', 'tbx', 'xliff'].includes(exportConfig.suffix)"
+        >
           <div class="table">
             <div class="tr t-header">
               <div class="td">source</div>
               <div class="td">target</div>
             </div>
-            <div v-for="(item, index) in transformationFile.data" :key="index" class="tr">
+            <div
+              v-for="(item, index) in transformationFile.data"
+              :key="index"
+              class="tr"
+            >
               <div class="td">{{ item[0] }}</div>
               <div class="td">{{ item[1] }}</div>
             </div>
@@ -93,10 +118,15 @@
       </div>
       <div class="transformation-footer">
         <a-button type="primary" @click="exportClick">导出</a-button>
-        <a-button type="dashed" style="margin-left: 20px" @click="resetFile">重新选择</a-button>
+        <a-button type="dashed" style="margin-left: 20px" @click="resetFile"
+          >重新选择</a-button
+        >
       </div>
     </div>
-    <div v-if="isStartTransformation && type === 1" class="transformation-start-forder">
+    <div
+      v-if="isStartTransformation && type === 1"
+      class="transformation-start-forder"
+    >
       <div class="header" style="margin-bottom: 15px">
         <div class="breadcrumb">
           <a-breadcrumb>
@@ -112,7 +142,9 @@
           <a-button type="link">查看转换记录</a-button>
         </div>
       </div>
-      <div class="title">支持tmx、tbx、ass、srt、xlsx、docx、xliff等文件的标准化批量转换</div>
+      <div class="title">
+        支持tmx、tbx、ass、srt、xlsx、docx、xliff等文件的标准化批量转换
+      </div>
       <div class="forder-body">
         <div class="forder-table table">
           <div class="tr t-header">
@@ -145,12 +177,14 @@
       </div>
       <div class="transformation-footer">
         <a-button type="primary" @click="exportForderClick">导出</a-button>
-        <a-button type="dashed" style="margin-left: 20px" @click="resetFile">重新选择</a-button>
+        <a-button type="dashed" style="margin-left: 20px" @click="resetFile"
+          >重新选择</a-button
+        >
       </div>
     </div>
     <a-modal
       v-model="modal.visible"
-      title="导出"
+      title="保存"
       ok-text="确认"
       cancel-text="取消"
       @cancel="hideModal"
@@ -160,7 +194,11 @@
       <div class="input-group">
         <div class="input-title">导出格式</div>
         <div class="input-value">
-          <a-select v-model="exportConfig.suffix" style="width: 320px" placeholder="请选择文件保存格式">
+          <a-select
+            v-model="exportConfig.suffix"
+            style="width: 320px"
+            placeholder="请选择文件保存格式"
+          >
             <a-select-option value="txt">TXT</a-select-option>
             <a-select-option value="tmx">TMX</a-select-option>
             <a-select-option value="tbx">TBX</a-select-option>
@@ -173,8 +211,13 @@
       <div class="input-group">
         <div class="input-title">编码格式</div>
         <div class="input-value">
-          <a-select v-model="exportConfig.format" style="width: 320px" placeholder="请选择编码格式">
+          <a-select
+            v-model="exportConfig.format"
+            style="width: 320px"
+            placeholder="请选择编码格式"
+          >
             <a-select-option value="utf8">utf-8</a-select-option>
+            <a-select-option value="utf16"> utf-16 </a-select-option>
             <a-select-option value="GBK">gbk</a-select-option>
           </a-select>
         </div>
@@ -192,19 +235,45 @@
             style="width: 320px"
             placeholder="请选择原文语种"
           >
-            <a-select-option value="zh-HK">中文- 中国香港</a-select-option>
-            <a-select-option value="zh-MO">中文 - 中国澳门</a-select-option>
-            <a-select-option value="zh-CN">中文 -中国</a-select-option>
-            <a-select-option value="zh-TW">中文 -中国台湾</a-select-option>
-            <a-select-option value="en-GB">英语 - 英国</a-select-option>
-            <a-select-option value="en-US">英语 - 美国</a-select-option>
-            <a-select-option value="fr-FR">法语 -法国</a-select-option>
-            <a-select-option value="de-DE">德语 -德国</a-select-option>
-            <a-select-option value="it-IT">意大利语 -意大利</a-select-option>
-            <a-select-option value="ja-JP">日语 -日本</a-select-option>
-            <a-select-option value="ko-KR">韩语 -韩国</a-select-option>
-            <a-select-option value="ru-RU">俄语 -俄国</a-select-option>
-            <a-select-option value="es-ES">西班牙语 -西班牙</a-select-option>
+            <a-select-option value="zh-HK">
+              zh-HK（中文- 中国香港）
+            </a-select-option>
+            <a-select-option value="zh-MO">
+              zh-MO（中文 - 中国澳门）
+            </a-select-option>
+            <a-select-option value="zh-CN">
+              zh-CN（中文 -中国）
+            </a-select-option>
+            <a-select-option value="zh-TW">
+              zh-TW（中文 -中国台湾）
+            </a-select-option>
+            <a-select-option value="en-GB">
+              en-GB（英语 - 英国）
+            </a-select-option>
+            <a-select-option value="en-US">
+              en-US（英语 - 美国）
+            </a-select-option>
+            <a-select-option value="fr-FR">
+              fr-FR（法语 -法国）
+            </a-select-option>
+            <a-select-option value="de-DE">
+              de-DE（德语 -德国）
+            </a-select-option>
+            <a-select-option value="it-IT">
+              it-IT（意大利语 -意大利）
+            </a-select-option>
+            <a-select-option value="ja-JP">
+              ja-JP（日语 -日本）
+            </a-select-option>
+            <a-select-option value="ko-KR">
+              ko-KR（韩语 -韩国）
+            </a-select-option>
+            <a-select-option value="ru-RU">
+              ru-RU（俄语 -俄国）
+            </a-select-option>
+            <a-select-option value="es-ES">
+              es-ES（西班牙语 -西班牙）
+            </a-select-option>
           </a-select>
         </div>
       </div>
@@ -221,19 +290,45 @@
             style="width: 320px"
             placeholder="请选择原文语种"
           >
-            <a-select-option value="zh-HK">中文- 中国香港</a-select-option>
-            <a-select-option value="zh-MO">中文 - 中国澳门</a-select-option>
-            <a-select-option value="zh-CN">中文 -中国</a-select-option>
-            <a-select-option value="zh-TW">中文 -中国台湾</a-select-option>
-            <a-select-option value="en-GB">英语 - 英国</a-select-option>
-            <a-select-option value="en-US">英语 - 美国</a-select-option>
-            <a-select-option value="fr-FR">法语 -法国</a-select-option>
-            <a-select-option value="de-DE">德语 -德国</a-select-option>
-            <a-select-option value="it-IT">意大利语 -意大利</a-select-option>
-            <a-select-option value="ja-JP">日语 -日本</a-select-option>
-            <a-select-option value="ko-KR">韩语 -韩国</a-select-option>
-            <a-select-option value="ru-RU">俄语 -俄国</a-select-option>
-            <a-select-option value="es-ES">西班牙语 -西班牙</a-select-option>
+            <a-select-option value="zh-HK">
+              zh-HK（中文- 中国香港）
+            </a-select-option>
+            <a-select-option value="zh-MO">
+              zh-MO（中文 - 中国澳门）
+            </a-select-option>
+            <a-select-option value="zh-CN">
+              zh-CN（中文 -中国）
+            </a-select-option>
+            <a-select-option value="zh-TW">
+              zh-TW（中文 -中国台湾）
+            </a-select-option>
+            <a-select-option value="en-GB">
+              en-GB（英语 - 英国）
+            </a-select-option>
+            <a-select-option value="en-US">
+              en-US（英语 - 美国）
+            </a-select-option>
+            <a-select-option value="fr-FR">
+              fr-FR（法语 -法国）
+            </a-select-option>
+            <a-select-option value="de-DE">
+              de-DE（德语 -德国）
+            </a-select-option>
+            <a-select-option value="it-IT">
+              it-IT（意大利语 -意大利）
+            </a-select-option>
+            <a-select-option value="ja-JP">
+              ja-JP（日语 -日本）
+            </a-select-option>
+            <a-select-option value="ko-KR">
+              ko-KR（韩语 -韩国）
+            </a-select-option>
+            <a-select-option value="ru-RU">
+              ru-RU（俄语 -俄国）
+            </a-select-option>
+            <a-select-option value="es-ES">
+              es-ES（西班牙语 -西班牙）
+            </a-select-option>
           </a-select>
         </div>
       </div>
@@ -241,8 +336,15 @@
       <div class="input-group">
         <div class="input-title">保存路径</div>
         <div class="input-value">
-          <a-input style="width: 320px" placeholder="请选择保存路径" :disabled="true" v-model="downUrl">
-            <div @click="selectFolder" class="selectFolder" slot="addonAfter">选择</div>
+          <a-input
+            style="width: 320px"
+            placeholder="请选择保存路径"
+            :disabled="true"
+            v-model="downUrl"
+          >
+            <div @click="selectFolder" class="selectFolder" slot="addonAfter">
+              选择
+            </div>
           </a-input>
         </div>
       </div>
@@ -271,28 +373,28 @@ export default {
       transformationFiles: [],
       downUrl: downUrl || exportService.getDownPath(),
       modal: {
-        visible: false
+        visible: false,
       },
       exportConfig: {
         suffix: "txt",
         format: "utf8",
         separate: {
           character: "||",
-          type: 0
+          type: 0,
         },
         langObj: {
           source: "zh-CN",
-          target: "en-US"
+          target: "en-US",
         },
         lang: {
           isEn: true,
-          isZh: true
+          isZh: true,
         },
         insert: {
           before: "",
-          after: ""
-        }
-      }
+          after: "",
+        },
+      },
     };
   },
   methods: {
@@ -305,10 +407,12 @@ export default {
         this.$ipcRenderer.send("timer.refresh");
         this.$router.push("/changerecord");
       } else {
+        this.$notification.close("notification");
         this.$notification.error({
+          key: "notification",
           message: "提示",
           duration: 5,
-          description: "请先登录后，进行操作"
+          description: "请先登录后，进行操作",
         });
       }
     },
@@ -319,7 +423,7 @@ export default {
     selectFolder() {
       this.$ipcRenderer.send("timer.refresh");
       const url = electron.remote.dialog.showOpenDialogSync({
-        properties: ["openDirectory"]
+        properties: ["openDirectory"],
       });
       if (url && url.length > 0) {
         this.downUrl = url[0];
@@ -333,7 +437,7 @@ export default {
         dstFileType: exportConfig.suffix,
         srcFileName: file.title,
         srcFileType: file.title.substring(file.title.lastIndexOf(".") + 1),
-        transStatus: 1
+        transStatus: 1,
       };
       console.log(formData);
       // TODO 添加到转换记录
@@ -344,20 +448,22 @@ export default {
       console.log(token);
       this.$axios
         .post(`${baseHref}/trans-records`, formData, {
-          headers: { token: token }
+          headers: { token: token },
         })
-        .then(result => {
+        .then((result) => {
           if (result.data.code == 1) {
+            // this.$notification.close('notification');
             this.$notification.success({
-              message: "导出成功",
+              // key: 'notification',
+              message: "保存成功",
               duration: 5,
-              description: name + "文件已导出文件夹:[ " + path + " ]"
+              description: name + "文件已导出文件夹:[ " + path + " ]",
             });
           } else {
             this.$message.error(result.data.msg);
           }
         })
-        .catch(error => {
+        .catch((error) => {
           console.log(error);
         });
       // this.$notification.success({
@@ -368,9 +474,9 @@ export default {
     },
     exportFunc(exportConfig, content, file) {
       this.$ipcRenderer.send("timer.refresh");
-      if(exportConfig.suffix=='xlsx'){
-        exportConfig.separate='';
-         console.log(exportConfig)
+      if (exportConfig.suffix == "xlsx") {
+        exportConfig.separate = "";
+        console.log(exportConfig);
       }
       switch (exportConfig.suffix) {
         case "tmx":
@@ -440,10 +546,12 @@ export default {
         this.$ipcRenderer.send("timer.refresh");
         this.$refs.myFile.click();
       } else {
+        this.$notification.close("notification");
         this.$notification.error({
+          key: "notification",
           message: "提示",
           duration: 5,
-          description: "请先登录后，进行操作"
+          description: "请先登录后，进行操作",
         });
       }
     },
@@ -457,14 +565,17 @@ export default {
       if (userId) {
         this.$ipcRenderer.send("timer.refresh");
         this.type = this.type === 0 ? 1 : 0;
+        this.$message.destroy();
         this.$message.success(
           this.type === 0 ? "已切换为单文件转换" : "已切换为批量文件转换"
         );
       } else {
+        this.$notification.close("notification");
         this.$notification.error({
+          key: "notification",
           message: "提示",
           duration: 5,
-          description: "请先登录后，进行操作"
+          description: "请先登录后，进行操作",
         });
       }
     },
@@ -483,7 +594,7 @@ export default {
     deleteFile(item) {
       this.$ipcRenderer.send("timer.refresh");
       this.transformationFiles = this.transformationFiles.filter(
-        d => d.path !== item.path
+        (d) => d.path !== item.path
       );
       if (this.transformationFiles.length === 0) {
         this.resetFile();
@@ -500,11 +611,11 @@ export default {
     },
     exportForderClick() {
       this.$ipcRenderer.send("timer.refresh");
-      this.transformationFiles.forEach(item => {
+      this.transformationFiles.forEach((item) => {
         setTimeout(() => {
-          this.analysisFile(item.path).then(result => {
+          this.analysisFile(item.path).then((result) => {
             item.data = result;
-            let content = result.map(item => {
+            let content = result.map((item) => {
               return item.join("\n");
             });
             content = content.join("\n");
@@ -516,17 +627,17 @@ export default {
     exportClick() {
       // this.exportOk();
       this.$ipcRenderer.send("timer.refresh");
-      let character=this.exportConfig.separate.character;
-      if(this.exportConfig.suffix=='xlsx'){
-         character='';
+      let character = this.exportConfig.separate.character;
+      if (this.exportConfig.suffix == "xlsx") {
+        character = "";
       }
       if (character) {
-        const result = this.transformationFile.data.map(item => {
+        const result = this.transformationFile.data.map((item) => {
           return item.join(this.exportConfig.separate.character);
         });
         this.transformationFile.content = result.join("\n");
       } else {
-        const result = this.transformationFile.data.map(item => {
+        const result = this.transformationFile.data.map((item) => {
           return item.join("\n");
         });
         this.transformationFile.content = result.join("\n");
@@ -542,17 +653,17 @@ export default {
             format
           )
         ) {
-          exportService.getFileContent(url).then(xmlData => {
+          exportService.getFileContent(url).then((xmlData) => {
             if (["tmx", "tbx", "xlff", "sdlxliff"].includes(format)) {
               const json = exportService.createJSONByXML(xmlData);
               const result = [];
               if (format === "tbx") {
-                json.martif.text.body.termEntry.forEach(item => {
+                json.martif.text.body.termEntry.forEach((item) => {
                   result.push([item.langSet.tig.term, item.descrip]);
                 });
               }
               if (format === "xlff" || format === "sdlxliff") {
-                json.xliff.file.body.group.forEach(item => {
+                json.xliff.file.body.group.forEach((item) => {
                   let obj = item["trans-unit"];
                   // if (obj) {
                   //   obj = obj["seg-source"];
@@ -574,12 +685,12 @@ export default {
                   }
                   result.push([
                     (obj.source && obj.source.g) || "",
-                    (obj.target && obj.target.g && obj.target.g.mrk) || ""
+                    (obj.target && obj.target.g && obj.target.g.mrk) || "",
                   ]);
                 });
               }
               if (format === "tmx") {
-                json.tmx.body.tu.forEach(item => {
+                json.tmx.body.tu.forEach((item) => {
                   if (item.tuv.length === 2) {
                     let d = [];
                     if (typeof item.tuv[0].seg === "string") {
@@ -606,7 +717,7 @@ export default {
               const result = [];
               let aryRef = exportService.formatContentByTxt(
                 {
-                  insert: {}
+                  insert: {},
                 },
                 xmlData
               );
@@ -624,7 +735,7 @@ export default {
         } else if (["xlsx"].includes(format)) {
           const json = exportService.createJSONByXlsx(url);
           const result = [];
-          json.forEach(item => {
+          json.forEach((item) => {
             for (let i = 1; i < item.data.length; i++) {
               result.push([item.data[i][0], item.data[i][1]]);
             }
@@ -636,12 +747,12 @@ export default {
           // this.exportConfig.separate.character = "||";
           // this.startTransformation();
         } else if (["docx"].includes(format)) {
-          exportService.getWordContent(url).then(text => {
+          exportService.getWordContent(url).then((text) => {
             console.log(text);
             const result = [];
             let aryRef = exportService.formatContentByTxt(
               {
-                insert: {}
+                insert: {},
               },
               text
             );
@@ -671,10 +782,10 @@ export default {
               "ass",
               "xlff",
               "xlsx",
-              "sdlxliff"
-            ]
-          }
-        ]
+              "sdlxliff",
+            ],
+          },
+        ],
       });
       if (url && url.length > 0) {
         if (this.type === 0) {
@@ -684,7 +795,7 @@ export default {
             url[0].lastIndexOf(".")
           );
           this.transformationFile.title = name + "." + format;
-          this.analysisFile(url[0]).then(result => {
+          this.analysisFile(url[0]).then((result) => {
             this.transformationFile.path = url[0];
             this.transformationFile.data = result;
             this.exportConfig.name = name;
@@ -698,7 +809,7 @@ export default {
             return false;
           }
           let files = url;
-          files = files.filter(d => {
+          files = files.filter((d) => {
             const format = d.substring(d.lastIndexOf(".") + 1);
             return [
               "txt",
@@ -708,12 +819,12 @@ export default {
               "srt",
               "ass",
               "xlff",
-              "xlsx"
+              "xlsx",
             ].includes(format);
           });
           console.log(files);
           this.transformationFiles = [];
-          files.forEach(item => {
+          files.forEach((item) => {
             const format = item.substring(item.lastIndexOf(".") + 1);
             const name = item.substring(item.lastIndexOf(path.sep) + 1);
             this.transformationFiles.push({
@@ -733,28 +844,28 @@ export default {
                 ),
                 separate: {
                   character: "",
-                  type: 0
+                  type: 0,
                 },
                 langObj: {
                   source: "zh-CN",
-                  target: "en-US"
+                  target: "en-US",
                 },
                 lang: {
                   isEn: true,
-                  isZh: true
+                  isZh: true,
                 },
                 insert: {
                   before: "",
-                  after: ""
-                }
-              }
+                  after: "",
+                },
+              },
             });
           });
           this.startTransformation();
         }
       }
-    }
-  }
+    },
+  },
 };
 </script>
 

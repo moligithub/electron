@@ -4,10 +4,12 @@
       <a-tab-pane key="1" tab="单语搜索">
         <div class="clearfix">
           <a-upload
+            :disabled="isdisabled"
             :file-list="fileList"
             :remove="handleRemove"
             :before-upload="beforeUpload"
             multiple
+            @click="click"
           >
             <a-button>
               <a-icon type="upload" />选择文件
@@ -18,7 +20,7 @@
           <a-input placeholder="请输入关键词开始搜索" v-model="searchContent" allow-clear />
           <a-button type="primary" @click="startSearcch()">开始检索</a-button>
         </div>
-        <div style="height:580px;overflow: auto;">
+        <div class="content-style">
           <a-table
             :columns="columns"
             :data-source="data"
@@ -38,6 +40,7 @@
       <a-tab-pane key="2" tab="双语搜索" force-render>
         <div class="clearfix">
           <a-upload
+            :disabled="isdisabled"
             :file-list="bothFileList"
             :remove="bothRemove"
             :before-upload="bothbeforeUpload"
@@ -50,13 +53,29 @@
         </div>
 
         <div class="search">
-          <div>原文：</div>
-          <a-input placeholder="请输入关键词" v-model="originalContent" allow-clear />
-          <div>译文：</div>
-          <a-input placeholder="请输入关键词" v-model="translationContent" allow-clear />
+          <div style="width:100%;display:inherit;">
+            <div id="originalDiv" style="width:48%">
+              <span>原文：</span>
+              <a-input placeholder="请输入原文关键词" v-model="originalContent" allow-clear />
+            </div>
+
+            <a-button
+              type="link"
+              style="width:4%;font-size:large;margin-left:40px;"
+              @click="getEle($event)"
+              id="btnSwitch"
+              ref="dataValue"
+              data-value="0"
+            >⇋</a-button>
+
+            <div id="translationDiv" style="width:48%;">
+              <span>译文：</span>
+              <a-input placeholder="请输入译文关键词" v-model="translationContent" allow-clear />
+            </div>
+          </div>
           <a-button type="primary" @click="bothstartSearcch()">开始检索</a-button>
         </div>
-        <div style="height:580px;overflow: auto;">
+        <div class="content-style">
           <a-table
             :columns="bothcolumns"
             :data-source="bothdata"
@@ -82,7 +101,8 @@ const exportService = new ExportService();
 const columns = [
   {
     title: "来源",
-    dataIndex: "filename"
+    dataIndex: "filename",
+    width: "70px"
   },
   {
     title: "语料内容",
@@ -93,7 +113,8 @@ const columns = [
 const bothcolumns = [
   {
     title: "来源",
-    dataIndex: "filename"
+    dataIndex: "filename",
+    width: "70px"
   },
   {
     title: "原文内容",
@@ -110,6 +131,7 @@ const bothcolumns = [
 export default {
   data() {
     return {
+      isdisabled: false,
       fileList: [],
       bothFileList: [],
       loading: false,
@@ -138,6 +160,35 @@ export default {
     };
   },
   methods: {
+    click() {
+      console.log(123);
+    },
+    getEle: function(e) {
+      let btnval = e.target.getAttribute("data-value");
+
+      let tranTxt = this.translationContent;
+      let origTxt = this.originalContent;
+
+      if (btnval == "0") {
+        e.target.setAttribute("data-value", "1");
+        this.$el
+          .querySelector("#btnSwitch")
+          .before(this.$el.querySelector("#translationDiv"));
+        this.$el
+          .querySelector("#btnSwitch")
+          .after(this.$el.querySelector("#originalDiv"));
+      } else {
+        e.target.setAttribute("data-value", "0");
+        this.$el
+          .querySelector("#btnSwitch")
+          .before(this.$el.querySelector("#originalDiv"));
+        this.$el
+          .querySelector("#btnSwitch")
+          .after(this.$el.querySelector("#translationDiv"));
+      }
+      this.translationContent = origTxt;
+      this.originalContent = tranTxt;
+    },
     handleRemove(file) {
       const index = this.fileList.indexOf(file);
       const newFileList = this.fileList.slice();
@@ -161,7 +212,9 @@ export default {
         }
         return false;
       } else {
+        this.$notification.close("notification");
         this.$notification.error({
+          key: "notification",
           message: "提示",
           duration: 5,
           description: "请先登录后，进行操作"
@@ -190,7 +243,9 @@ export default {
         }
         return false;
       } else {
+        this.$notification.close("notification");
         this.$notification.error({
+          key: "notification",
           message: "提示",
           duration: 5,
           description: "请先登录后，进行操作"
@@ -253,7 +308,9 @@ export default {
           });
         }
       } else {
+        this.$notification.close("notification");
         this.$notification.error({
+          key: "notification",
           message: "提示",
           duration: 5,
           description: "请先登录后，进行操作"
@@ -286,20 +343,22 @@ export default {
                       "(" + this.originalContent + ")",
                       "g"
                     );
-                    if (pattern.exec(item[0].toString())) {
-                      let replace = item[0]
-                        .toString()
-                        .replace(
-                          pattern,
-                          '<span style="background: yellow;">$1</span>'
-                        );
-                      replace = `<p>${replace}</p>`;
-                      object = {
-                        key: index,
-                        filename,
-                        orgcontent: replace,
-                        trancontent: item[1]
-                      };
+                    if (item[0]) {
+                      if (pattern.exec(item[0].toString())) {
+                        let replace = item[0]
+                          .toString()
+                          .replace(
+                            pattern,
+                            '<span style="background: yellow;">$1</span>'
+                          );
+                        replace = `<p>${replace}</p>`;
+                        object = {
+                          key: index,
+                          filename,
+                          orgcontent: replace,
+                          trancontent: item[1]
+                        };
+                      }
                     }
                   }
                   if (this.translationContent != "") {
@@ -307,23 +366,25 @@ export default {
                       "(" + this.translationContent + ")",
                       "g"
                     );
-                    if (pattern.exec(item[1].toString())) {
-                      let replace = item[1]
-                        .toString()
-                        .replace(
-                          pattern,
-                          '<span style="background: yellow;">$1</span>'
-                        );
-                      replace = `<p>${replace}</p>`;
-                      if (object != null) {
-                        object.trancontent = replace;
-                      } else {
-                        object = {
-                          key: index,
-                          filename,
-                          orgcontent: item[0],
-                          trancontent: replace
-                        };
+                    if (item[1]) {
+                      if (pattern.exec(item[1].toString())) {
+                        let replace = item[1]
+                          .toString()
+                          .replace(
+                            pattern,
+                            '<span style="background: yellow;">$1</span>'
+                          );
+                        replace = `<p>${replace}</p>`;
+                        if (object != null) {
+                          object.trancontent = replace;
+                        } else {
+                          object = {
+                            key: index,
+                            filename,
+                            orgcontent: item[0],
+                            trancontent: replace
+                          };
+                        }
                       }
                     }
                   }
@@ -349,7 +410,9 @@ export default {
           });
         }
       } else {
+        this.$notification.close("notification");
         this.$notification.error({
+          key: "notification",
           message: "提示",
           duration: 5,
           description: "请先登录后，进行操作"
@@ -476,15 +539,37 @@ export default {
         }
       });
     }
+  },
+  created() {
+    const userId = this.$db
+      .read()
+      .get("userId")
+      .value();
+    if (userId) {
+      this.isdisabled = false;
+    } else {
+      this.isdisabled = true;
+    }
+    this.$bus.on("loginIn", () => {
+      this.isdisabled = false;
+    });
   }
 };
 </script>
 <style lang="scss" scoped>
 .main {
   padding: 50px;
-  padding-top: 10px;
+  padding-top: 0px;
   .clearfix {
     margin-top: 20px;
+  }
+  /deep/.ant-upload-list {
+    max-height: 100px;
+    overflow: auto;
+  }
+  .content-style {
+    height: calc(100vh - 320px);
+    overflow: auto;
   }
   .search {
     display: flex;

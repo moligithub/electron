@@ -3,6 +3,7 @@ import { app, protocol, BrowserWindow, Menu, ipcMain } from "electron";
 import { createProtocol } from "vue-cli-plugin-electron-builder/lib";
 import installExtension, { VUEJS_DEVTOOLS } from "electron-devtools-installer";
 const isDevelopment = process.env.NODE_ENV !== "production";
+import { dbMap } from "./datastore";
 // Scheme must be registered before the app is ready
 protocol.registerSchemesAsPrivileged([
   { scheme: "app", privileges: { secure: true, standard: true } },
@@ -96,6 +97,7 @@ async function createWindow () {
     await workerWindow.loadURL("app://./index.html");
   }
   win.on('closed', () => {
+    dbMap.removeDb();
     app.quit();
   })
   // workerWindow.webContents.openDevTools();
@@ -104,6 +106,7 @@ async function createWindow () {
 app.on("window-all-closed", () => {
   // On macOS it is common for applications and their menu bar
   // to stay active until the user quits explicitly with Cmd + Q
+  dbMap.removeDb();
   app.quit();
 });
 
@@ -129,7 +132,12 @@ app.on("ready", async () => {
     sendWindowMessage(win, "message-to-renderer", arg);
   });
   ipcMain.on("message-from-renderer", (event, arg) => {
-    sendWindowMessage(workerWindow, "message-from-main", arg);
+    if (arg.data && arg.data.isMain) {
+      console.log(arg);
+      mainWorker[arg.action](arg.data);
+    } else {
+      sendWindowMessage(workerWindow, "message-from-main", arg);
+    }
   });
   ipcMain.on("ready", (event, arg) => {
     console.info("child process ready");
@@ -153,6 +161,7 @@ function sendWindowMessage (targetWindow, message, payload) {
 }
 const gotTheLock = app.requestSingleInstanceLock();
 if (!gotTheLock) {
+  dbMap.removeDb();
   app.exit();
 } else {
   app.on('second-instance', (event, commandLine, workingDirectory) => {
@@ -171,12 +180,21 @@ if (isDevelopment) {
   if (process.platform === "win32") {
     process.on("message", (data) => {
       if (data === "graceful-exit") {
+        dbMap.removeDb();
         app.exit();
       }
     });
   } else {
     process.on("SIGTERM", () => {
+      dbMap.removeDb();
       app.exit();
     });
   }
 }
+
+const mainWorker = {
+  'logout.app': () => {
+    dbMap.removeDb();
+    app.quit();
+  },
+};

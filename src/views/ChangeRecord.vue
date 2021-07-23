@@ -12,7 +12,10 @@
     </div>
 
     <div class="list">
-      <a-table bordered :data-source="dataSource" :columns="columns" :pagination="pagination">
+      <a-table bordered :data-source="dataSource" :columns="columns" :pagination="pagination" @change="change">
+        <template slot="sort" slot-scope="text, record,index">
+          {{(pagination.current-1)*pagination.pageSize+index+1}}
+        </template>
         <template slot="operation" slot-scope="text, record">
           <a-popconfirm
             v-if="dataSource.length"
@@ -40,6 +43,7 @@ export default {
       pagination: {
         total: 0,
         pageSize: 5, //每页中显示10条数据
+        current: 1,
         showSizeChanger: true,
         pageSizeOptions: ["10", "20", "50", "100"], //每页中显示的数据
         showTotal: total => `共有 ${total} 条数据` //分页中显示总的数据
@@ -47,9 +51,9 @@ export default {
       columns: [
         {
           title: "序号",
-          // render: (text, record, index) => `${index + 1}`
-          dataIndex: "id",
-          scopedSlots: { customRender: "name" }
+          // customRender: (text, record, index) => `${index + 1}`
+          // dataIndex: "id",
+          scopedSlots: { customRender: "sort" }
         },
         {
           title: "创建时间",
@@ -84,6 +88,9 @@ export default {
     this.query();
   },
   methods: {
+    change(pagination){
+      this.pagination = pagination
+    },
     search() {
       if (this.searchContent != "") {
         this.dataSource = this.orgDataSource.filter(item => {
@@ -92,8 +99,8 @@ export default {
           }
         });
       } else {
-         let [...filterData]=this.orgDataSource;
-         this.dataSource=filterData;
+        let [...filterData] = this.orgDataSource;
+        this.dataSource = filterData;
       }
       this.pagination.total = this.dataSource.length || 0;
     },
@@ -116,6 +123,7 @@ export default {
         .then(res => {
           console.log(res);
           if (res.data.code == 1) {
+            this.$message.destroy();
             this.$message.success("删除成功");
             this.query();
           } else {
@@ -171,6 +179,10 @@ export default {
       font-size: 12px;
       cursor: pointer;
     }
+  }
+  .list {
+    height: calc(100vh - 200px);
+    overflow: auto;
   }
   .search {
     display: flex;

@@ -110,9 +110,9 @@ export default {
         email: [
           { required: true, validator: validateEmail, trigger: "change" }
         ],
-        pass: [{ required: true, validator: validatePass, trigger: "change" }],
+        pass: [{ required: true, validator: validatePass, trigger: "blur" }],
         checkPass: [
-          { required: true, validator: validatePass2, trigger: "change" }
+          { required: true, validator: validatePass2, trigger: "blur" }
         ]
       },
       layout: {

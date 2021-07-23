@@ -41,6 +41,12 @@
             <div class="bottom">
               <a-button type="primary" @click="okClick">提交</a-button>
             </div>
+            <div class="mention">
+              <div class="fontstyle" style="display:inline;">技术支持：</div>
+              <span
+                style="display:inline;margin-left:20px;"
+              >如果您处理文件时需要技术支持，可将该文件发送邮箱 prima.huang@transn.com，描述您的详细需求，我们将第一时间响应，为您服务。</span>
+            </div>
           </div>
         </a-tab-pane>
       </a-tabs>
@@ -72,20 +78,41 @@ export default {
         .read()
         .get("userId")
         .value();
-      this.$axios
-        .post(`${baseHref}/help/feedback`, this.handleMode, {
-          headers: { token: token }
-        })
-        .then(res => {
-          if (res.data.code == 1) {
-            this.$message.success("提交成功");
-          } else {
-            this.$message.error(res.data.msg);
-          }
-        })
-        .catch(error => {
-          console.log(error);
+      if (token) {
+        if (this.handleMode.content.length > 500) {
+          this.$notification.close("notification");
+          this.$notification.error({
+            key: "notification",
+            message: "提示",
+            duration: 5,
+            description: "提交内容不能超过500个字符长度！"
+          });
+          return;
+        }
+        this.$axios
+          .post(`${baseHref}/help/feedback`, this.handleMode, {
+            headers: { token: token }
+          })
+          .then(res => {
+            if (res.data.code == 1) {
+              this.$message.destroy();
+              this.$message.success("提交成功");
+            } else {
+              this.$message.error(res.data.msg);
+            }
+          })
+          .catch(error => {
+            console.log(error);
+          });
+      } else {
+        this.$notification.close("notification");
+        this.$notification.error({
+          key: "notification",
+          message: "提示",
+          duration: 5,
+          description: "请先登录后，进行操作"
         });
+      }
     }
   }
 };
@@ -128,6 +155,9 @@ export default {
     }
     .bottom {
       text-align: right;
+      margin-top: 20px;
+    }
+    .mention {
       margin-top: 20px;
     }
   }

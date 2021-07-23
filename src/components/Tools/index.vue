@@ -9,10 +9,18 @@
       :class="{ disbaled: item.disabled }"
       @click="handleClick(item.func)"
       class="btn"
-    >{{ item.title }}</div>
-    <div @click="goToPage(1, '/help')" class="btn" :class="{active : active==1}">帮助</div>
+    >
+      {{ item.title }}
+    </div>
+    <div
+      @click="goToPage(1, '/help')"
+      class="btn"
+      :class="{ active: active == 1 }"
+    >
+      帮助
+    </div>
     <div class="user" @click="goUserinfo()" v-if="islogin">
-      <a-icon type="user" style="font-size: 19px;"/>
+      <a-icon type="user" style="font-size: 19px" />
       <!-- <a-avatar size="small" icon="user" /> -->
       <span>{{ userInfo.name }}</span>
       <div class="quit" @click.stop="quitClick()">退出</div>
@@ -22,19 +30,31 @@
       <div @click="register()">注册</div>
     </div>
 
-    <div v-if="isloadFile" class="loadding">
-      <a-spin />正在打开...
-    </div>
+    <div v-if="isloadFile" class="loadding"><a-spin />正在打开...</div>
 
     <!-- 登录 -->
     <div class="login-info">
       <a-modal v-model="visible" title="登录" :footer="null" @cancel="close">
-        <a-form-model ref="ruleForm" :model="ruleForm" :rules="rules" v-bind="layout">
+        <a-form-model
+          ref="ruleForm"
+          :model="ruleForm"
+          :rules="rules"
+          v-bind="layout"
+        >
           <a-form-model-item has-feedback label="用户名" prop="name">
-            <a-input v-model="ruleForm.name" placeholder="请输入用户名" autocomplete="off" />
+            <a-input
+              v-model="ruleForm.name"
+              placeholder="请输入用户名"
+              autocomplete="off"
+            />
           </a-form-model-item>
           <a-form-model-item has-feedback label="密码" prop="pwd">
-            <a-input v-model="ruleForm.pwd" placeholder="请输入密码" type="password" autocomplete="off" />
+            <a-input
+              v-model="ruleForm.pwd"
+              placeholder="请输入密码"
+              type="password"
+              autocomplete="off"
+            />
           </a-form-model-item>
           <div
             @click="forget()"
@@ -45,14 +65,21 @@
               cursor: pointer;
               font-size: 12px;
             "
-          >忘记密码</div>
+          >
+            忘记密码
+          </div>
           <a-form-model-item :wrapper-col="{ span: 14, offset: 6 }">
-            <a-button style="margin-left: 10px; width: 100px" @click="resetForm('ruleForm')">注册</a-button>
+            <a-button
+              style="margin-left: 10px; width: 100px"
+              @click="resetForm('ruleForm')"
+              >注册</a-button
+            >
             <a-button
               style="margin-left: 10px; width: 100px"
               type="primary"
               @click="submitForm('ruleForm')"
-            >登录</a-button>
+              >登录</a-button
+            >
           </a-form-model-item>
         </a-form-model>
       </a-modal>
@@ -73,7 +100,7 @@ export default {
   components: { Handle, ForgetPwd, Register },
   watch: {
     $route: {
-      handler(to) {
+      handler (to) {
         if (to.name !== "transformationedit") {
           this.handles = this.handles.map(item => {
             if (
@@ -98,7 +125,7 @@ export default {
       immediate: true
     }
   },
-  data() {
+  data () {
     let validateName = (rule, value, callback) => {
       if (value === "") {
         callback(new Error("请输入用户名"));
@@ -192,7 +219,7 @@ export default {
       }
     };
   },
-  mounted() {
+  mounted () {
     // this.$db.unset("userInfo").write();
     // this.$db.unset("userId").write();
     this.$ipcRenderer.on("timer.logout", () => {
@@ -228,10 +255,10 @@ export default {
     });
   },
   methods: {
-    loadFile(status) {
+    loadFile (status) {
       this.isloadFile = status;
     },
-    handleClick(func) {
+    handleClick (func) {
       const userId = this.$db
         .read()
         .get("userId")
@@ -242,14 +269,16 @@ export default {
         this.$refs.handle[func]();
       } else {
         // this.$notification.destroy();
+        this.$notification.close('notification');
         this.$notification.error({
+          key: 'notification',
           message: "提示",
           duration: 5,
           description: "请先登录后，进行操作"
         });
       }
     },
-    goToPage(tab, path) {
+    goToPage (tab, path) {
       this.currentPage = tab;
       this.$ipcRenderer.send("timer.refresh");
       if (path == "/help") {
@@ -262,15 +291,15 @@ export default {
       //   this.$router.push(path);
       // }
     },
-    goUserinfo() {
-      this.active=0;
+    goUserinfo () {
+      this.active = 0;
       this.$ipcRenderer.send("timer.refresh");
       this.$router.push("/userinfo");
     },
-    login() {
+    login () {
       this.visible = true;
     },
-    quitClick() {
+    quitClick () {
       const token = this.$db
         .read()
         .get("userId")
@@ -292,19 +321,22 @@ export default {
             this.$ipcRenderer.send("timer.remove");
             this.userInfo = {};
             this.islogin = false;
+            this.$ipcRenderer.send('logout.app', {
+              isMain: true,
+            });
           } else {
             this.$message.error(result.data.msg);
           }
           console.log(result);
         });
     },
-    register() {
+    register () {
       this.$refs.myRegister.show();
     },
-    showLogin() {
+    showLogin () {
       this.visible = true;
     },
-    submitForm(formName) {
+    submitForm (formName) {
       this.$refs[formName].validate(valid => {
         if (valid) {
           console.log(this.ruleForm);
@@ -314,17 +346,21 @@ export default {
           let param = { name: this.ruleForm.name, password: this.ruleForm.pwd };
           this.$axios.post(`${baseHref}/user/login`, param).then(result => {
             if (result.data.code == 1) {
+              this.$message.destroy();
               this.$message.success("登录成功");
 
               this.visible = false;
               this.$db.set("userInfo", this.ruleForm).write();
               this.$db.set("userId", result.data.data).write();
+              this.$dbMap.setBasePath(this.ruleForm.name);
               this.$ipcRenderer.send("timer.listen", {
                 timer: time
               });
               this.islogin = true;
               this.userInfo = { ...this.ruleForm };
               this.$refs.ruleForm.resetFields();
+              this.$bus.emit('login');
+              this.$bus.emit('loginIn');
             } else {
               this.$message.error(result.data.msg);
             }
@@ -338,14 +374,14 @@ export default {
         }
       });
     },
-    resetForm(formName) {
+    resetForm (formName) {
       this.visible = false;
       this.$refs.myRegister.show();
     },
-    close() {
+    close () {
       this.$refs.ruleForm.resetFields();
     },
-    forget() {
+    forget () {
       this.visible = false;
       this.$refs.mychild.show();
       // this.isfindPwd=true;

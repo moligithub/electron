@@ -104,6 +104,7 @@ export default {
   padding-top: 10px;
   padding-right: 20px;
   background: #f7f7f7;
+  font-family: "sourcehansans";
 }
 .ant-tabs-content {
   height: calc(100% - 56px);

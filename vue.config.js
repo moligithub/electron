@@ -22,6 +22,7 @@ module.exports = {
         files: ["**/*", "**/node_modules/**/*", "**/src/**/*"],
         buildDependenciesFromSource: true,
       },
+      // externals:["electron-edge-js"],
     },
   },
   chainWebpack: (config) => {

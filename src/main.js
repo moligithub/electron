@@ -7,7 +7,7 @@ import 'ant-design-vue/dist/antd.css';
 import './assets/iconfont/iconfont.css';
 import Bus from './tools/bus';
 import axios from 'axios'
-import db, { DbMap } from './datastore';
+import db, { dbMap } from './datastore';
 import { ipcRenderer } from 'electron';
 let callbackCache = []
 Vue.prototype.$ipcRenderer = {
@@ -35,7 +35,7 @@ ipcRenderer.on('message-to-renderer', (sender, msg) => {
   })
 })
 Vue.prototype.$db = db
-Vue.prototype.$dbMap = new DbMap()
+Vue.prototype.$dbMap = dbMap
 // axios.defaults.withCredentials = true
 // axios.defaults.withCredentials=true;//让ajax携带cookie
 Vue.prototype.$axios = axios

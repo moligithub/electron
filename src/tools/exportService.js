@@ -6,12 +6,13 @@ import jschardet from "jschardet";
 import officegen from "officegen";
 import xlsx from "node-xlsx";
 import db from "../datastore";
+import WordEdit from "./office-edit/wordEdit";
 const mammoth = require("./mammoth/lib/index");
 
 export default class ExportService {
   constructor() {
     // 最大文件为10M
-    this.maxLength = 104857600;
+    this.maxLength = 10485760;
     this.xliffTemplate = {
       xliff: {
         _attrs: {
@@ -52,13 +53,14 @@ export default class ExportService {
     };
   }
 
-  getFileSize(pathUrl, status) {
+  getFileSize (pathUrl, status) {
     return new Promise((resolve, reject) => {
       fs.stat(pathUrl, (err, data) => {
         if (err) {
           reject(err);
           return;
         }
+        console.log(data.size);
         if (status) {
           resolve(data);
         } else if (data.size < this.maxLength) {
@@ -72,15 +74,15 @@ export default class ExportService {
     });
   }
 
-  getDownPath() {
+  getDownPath () {
     return path.join(__dirname, "../../");
   }
 
-  deleteFileByPath(path) {
+  deleteFileByPath (path) {
     fs.unlinkSync(path);
   }
 
-  getFileContent(pathUrl, isBuffer) {
+  getFileContent (pathUrl, isBuffer) {
     return new Promise((resolve, reject) => {
       const format = pathUrl.substring(pathUrl.lastIndexOf(".") + 1);
       fs.readFile(pathUrl, (err, con) => {
@@ -122,7 +124,7 @@ export default class ExportService {
       });
     });
   }
-  getCurrentDate() {
+  getCurrentDate () {
     var now = new Date();
     var year = now.getFullYear(); //得到年份
     var month = now.getMonth(); //得到月份
@@ -155,21 +157,22 @@ export default class ExportService {
       year + "-" + month + "-" + date + " " + hour + ":" + minu + ":" + sec;
     return time;
   }
-  createXMlByJSON(obj, template) {
+  createXMlByJSON (obj, template) {
     return new fxp.j2xParser({
       format: true,
       attrNodeName: "_attrs",
     }).parse(obj);
   }
 
-  createJSONByXML(xml) {
+  createJSONByXML (xml) {
+    console.log(xml);
     return fxp.parse(xml);
   }
 
-  createJSONByXlsx(pathUrl) {
+  createJSONByXlsx (pathUrl) {
     return xlsx.parse(fs.readFileSync(pathUrl));
   }
-  getWordContent(path) {
+  getWordContent (path) {
     return new Promise((resolve, reject) => {
       mammoth
         .convertToHtml({ path })
@@ -188,7 +191,7 @@ export default class ExportService {
     });
   }
 
-  formatContentByTxt(config, content) {
+  formatContentByTxt (config, content) {
     const ary = content.split(/\n|\r/);
     const aryRef = ary.filter((d) => d.trim());
     const result = {
@@ -248,7 +251,7 @@ export default class ExportService {
     console.log(result);
     return result;
   }
-  exportXlsx(config, content, downUrl, status) {
+  exportXlsx (config, content, downUrl, status) {
     const contentJSON = this.formatContentByTxt(config, content);
     const result = Object.assign({}, this.tmxTemplate);
     const userId = db
@@ -361,7 +364,7 @@ export default class ExportService {
       path: downUrl,
     });
   }
-  exportTmx(config, content, downUrl, status) {
+  exportTmx (config, content, downUrl, status) {
     const contentJSON = this.formatContentByTxt(config, content);
     const result = Object.assign({}, this.tmxTemplate);
     for (let i = 0; i < contentJSON.length; i++) {
@@ -393,7 +396,7 @@ ${this.createXMlByJSON(result).toString()}`
       path: downUrl,
     });
   }
-  exportTxt(config, content, downUrl, status) {
+  exportTxt (config, content, downUrl, status) {
     const contentJSON = this.formatContentByTxt(config, content);
     console.log(downUrl + path.sep + config.name + ".txt");
     if (Array.isArray(contentJSON)) {
@@ -407,37 +410,29 @@ ${this.createXMlByJSON(result).toString()}`
       });
     } else {
       if (config.format !== "utf8") {
-        console.log(config.format);
-        if (config.lang.isZh && config.lang.isEn) {
-          console.log(
-            iconv.encode(contentJSON.content.join("\n"), config.format)
-          );
-          fs.writeFileSync(
-            status ? downUrl : downUrl + path.sep + config.name + ".txt",
-            iconv.encode(contentJSON.content.join("\n"), config.format)
-          );
-          return Promise.resolve({
-            name: config.name + ".txt",
-            path: downUrl,
-          });
-        } else if (config.lang.isZh) {
-          fs.writeFileSync(
-            status ? downUrl : downUrl + path.sep + config.name + "-zh.txt",
-            iconv.encode(contentJSON.source.join("\n"), config.format)
-          );
-          return Promise.resolve({
-            name: config.name + "-zh.txt",
-            path: downUrl,
-          });
-        } else if (config.lang.isEn) {
-          fs.writeFileSync(
-            status ? downUrl : downUrl + path.sep + config.name + "-en.txt",
-            iconv.encode(contentJSON.target.join("\n"), config.format)
-          );
-          return Promise.resolve({
-            name: config.name + "-en.txt",
-            path: downUrl,
-          });
+        if (config.lang.isZh || config.lang.isEn) {
+          let resolve = null
+          if (config.lang.isZh) {
+            fs.writeFileSync(
+              status ? downUrl : downUrl + path.sep + config.name + "-zh.txt",
+              iconv.encode(contentJSON.source.join("\n"), config.format)
+            );
+            resolve = Promise.resolve({
+              name: config.name + "-zh.txt",
+              path: downUrl,
+            });
+          }
+          if (config.lang.isEn) {
+            fs.writeFileSync(
+              status ? downUrl : downUrl + path.sep + config.name + "-en.txt",
+              iconv.encode(contentJSON.target.join("\n"), config.format)
+            );
+            resolve = Promise.resolve({
+              name: config.name + "-en.txt",
+              path: downUrl,
+            });
+          }
+          return resolve
         } else {
           fs.writeFileSync(
             status ? downUrl : downUrl + path.sep + config.name + ".txt",
@@ -449,33 +444,29 @@ ${this.createXMlByJSON(result).toString()}`
           });
         }
       } else {
-        if (config.lang.isZh && config.lang.isEn) {
-          fs.writeFileSync(
-            status ? downUrl : downUrl + path.sep + config.name + ".txt",
-            contentJSON.content.join("\n")
-          );
-          return Promise.resolve({
-            name: config.name + ".txt",
-            path: downUrl,
-          });
-        } else if (config.lang.isZh) {
-          fs.writeFileSync(
-            status ? downUrl : downUrl + path.sep + config.name + "-zh.txt",
-            contentJSON.source.join("\n")
-          );
-          return Promise.resolve({
-            name: config.name + "-zh.txt",
-            path: downUrl,
-          });
-        } else if (config.lang.isEn) {
-          fs.writeFileSync(
-            status ? downUrl : downUrl + path.sep + config.name + "-en.txt",
-            contentJSON.target.join("\n")
-          );
-          return Promise.resolve({
-            name: config.name + "-en.txt",
-            path: downUrl,
-          });
+        if (config.lang.isZh || config.lang.isEn) {
+          let resolve = null
+          if (config.lang.isZh) {
+            fs.writeFileSync(
+              status ? downUrl : downUrl + path.sep + config.name + "-zh.txt",
+              contentJSON.source.join("\n")
+            );
+            resolve = Promise.resolve({
+              name: config.name + "-zh.txt",
+              path: downUrl,
+            });
+          }
+          if (config.lang.isEn) {
+            fs.writeFileSync(
+              status ? downUrl : downUrl + path.sep + config.name + "-en.txt",
+              contentJSON.target.join("\n")
+            );
+            resolve = Promise.resolve({
+              name: config.name + "-en.txt",
+              path: downUrl,
+            });
+          }
+          return resolve
         } else {
           fs.writeFileSync(
             status ? downUrl : downUrl + path.sep + config.name + ".txt",
@@ -489,7 +480,7 @@ ${this.createXMlByJSON(result).toString()}`
       }
     }
   }
-  exportDocx(config, content, downUrl, status) {
+  exportDocx (config, content, downUrl, status) {
     const contentJSON = this.formatContentByTxt(config, content);
     const docx = officegen("docx");
     if (Array.isArray(contentJSON)) {
@@ -498,38 +489,67 @@ ${this.createXMlByJSON(result).toString()}`
         pObj.addText(item);
       });
     } else {
-      if (config.lang.isZh && config.lang.isEn) {
-        contentJSON.content.forEach((item) => {
-          const pObj = docx.createP();
-          pObj.addText(item);
-        });
-      } else if (config.lang.isZh) {
-        contentJSON.source.forEach((item) => {
-          const pObj = docx.createP();
-          pObj.addText(item);
-        });
-      } else if (config.lang.isEn) {
-        contentJSON.target.forEach((item) => {
-          const pObj = docx.createP();
-          pObj.addText(item);
-        });
+
+      if (config.lang.isZh || config.lang.isEn) {
+        let resolve = null;
+
+        if (config.lang.isZh) {
+          contentJSON.source.forEach((item) => {
+            const pObj = docx.createP();
+            pObj.addText(item);
+          });
+
+          var out = fs.createWriteStream(
+            status ? downUrl : downUrl + path.sep + config.name + "-zh.docx"
+          );
+          docx.generate(out);
+
+          resolve = Promise.resolve({
+            name: config.name + "-zh.docx",
+            path: downUrl,
+          });
+        }
+
+        if (config.lang.isEn) {
+          contentJSON.target.forEach((item) => {
+            const pObj = docx.createP();
+            pObj.addText(item);
+          });
+
+          var out = fs.createWriteStream(
+            status ? downUrl : downUrl + path.sep + config.name + "-en.docx"
+          );
+          docx.generate(out);
+
+          resolve = Promise.resolve({
+            name: config.name + "-en.docx",
+            path: downUrl,
+          });
+        }
+
+        // WordEdit.wordDelNoteFoot('D:\\data\\input.docx', 'D:\\data\\output.docx');
+
+        return resolve
+
       } else {
         contentJSON.content.forEach((item) => {
           const pObj = docx.createP();
           pObj.addText(item);
         });
+
+        var out = fs.createWriteStream(
+          status ? downUrl : downUrl + path.sep + config.name + ".docx"
+        );
+        docx.generate(out);
+
+        return Promise.resolve({
+          name: config.name + ".docx",
+          path: downUrl,
+        });
       }
     }
-    var out = fs.createWriteStream(
-      status ? downUrl : downUrl + path.sep + config.name + ".docx"
-    );
-    docx.generate(out);
-    return Promise.resolve({
-      name: config.name + ".docx",
-      path: downUrl,
-    });
   }
-  exportTbx(config, content, downUrl, status) {
+  exportTbx (config, content, downUrl, status) {
     const contentJSON = this.formatContentByTxt(config, content);
     const result = Object.assign({}, this.tbxTemplate);
     for (let i = 0; i < contentJSON.length; i++) {
@@ -561,7 +581,7 @@ ${this.createXMlByJSON(result).toString()}
       path: downUrl,
     });
   }
-  exportXliff(config, content, downUrl, status) {
+  exportXliff (config, content, downUrl, status) {
     const contentJSON = this.formatContentByTxt(config, content);
     const result = Object.assign({}, this.xliffTemplate);
     for (let i = 0; i < contentJSON.length; i++) {

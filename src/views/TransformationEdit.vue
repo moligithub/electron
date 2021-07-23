@@ -1,10 +1,10 @@
 <template>
   <div class="transformation-edit">
-    <div v-if="panes.length === 0" class="empty">
+    <div v-if="panes.length === 0 || !isLogin" class="empty">
       <!-- <a-empty :description="'暂无文件，快去打开文件吧'" /> -->
       <div @click="clickButtonFile" class="upload-container">
         <div class="icon">
-          <img src="../assets/images/upload.svg" alt="" />
+          <img src="../assets/images/uploadSingle.svg" alt="" />
         </div>
         <div class="title">暂无文件，快去打开文件吧</div>
       </div>
@@ -107,18 +107,38 @@
       :visible="drawer.visible"
       @close="onClose"
     >
-      
-     <div style="position:relative;z-index:9999;margin-right:-8px;text-align:center;color:#0093FF;float:right;writing-mode:tb-rl;width: 0px;height: 100%;text-align: center;" 
-         :style="{ visibility: drawer.visible0 ? 'hidden' : 'visible' }"
-      class="buttom-option-name"> 基本操作</div>
-
     </a-drawer> -->
-    <div v-if="panes.length > 0" class="drawer-class drawer-top-class">
+    <div
+      style="
+        position: relative;
+        z-index: 9999;
+        margin-right: -8px;
+        text-align: center;
+        color: #0093ff;
+        float: right;
+        writing-mode: tb-rl;
+        width: 20px;
+        height: 100%;
+        text-align: center;
+        cursor: pointer;
+      "
+      @click="showDrawer(0)"
+      :style="{ visibility: drawer.visible0 ? 'hidden' : 'visible' }"
+      class="buttom-option-name"
+    >
+      基本操作
+    </div>
+
+    <div
+      v-if="panes.length > 0"
+      :style="{ zIndex: drawer.zIndex0 }"
+      class="drawer-class drawer-top-class"
+    >
       <div class="icon-close icon-close-top" @click="showDrawer(0)">
         <a-icon v-if="drawer.visible0" type="right" />
         <a-icon v-else type="left" />
       </div>
-      
+
       <div
         :style="{ width: drawer.visible0 ? '130px' : '0px' }"
         class="handle-texts"
@@ -197,14 +217,28 @@
         </div>
       </div>
     </div>
-    <div v-if="panes.length > 0" class="drawer-class drawer-bottom-class">
+    <div
+      v-if="panes.length > 0"
+      :style="{ zIndex: drawer.zIndex1 }"
+      class="drawer-class drawer-bottom-class"
+    >
       <div class="icon-close icon-close-bottom" @click="showDrawer(1)">
         <a-icon v-if="drawer.visible1" type="down" />
         <a-icon v-else type="up" />
       </div>
-       <div style="margin:-10px;text-align:center;color:#0093FF;" 
-          :style="{ visibility: drawer.visible1 ? 'hidden' : 'visible' }"
-      class="buttom-option-name"> 高级操作</div>
+      <div
+        style="
+          margin: -10px;
+          text-align: center;
+          color: #0093ff;
+          cursor: pointer;
+        "
+        :style="{ visibility: drawer.visible1 ? 'hidden' : 'visible' }"
+        @click="showDrawer(1)"
+        class="buttom-option-name"
+      >
+        高级操作
+      </div>
       <div
         :style="{ height: drawer.visible1 ? '120px' : '0px' }"
         class="setting"
@@ -228,7 +262,6 @@
               </a-select>
               <a-select
                 v-model="exportConfig.format"
-                v-if="exportConfig.suffix === 'txt'"
                 style="width: 100%; margin-top: 15px"
                 placeholder="请选择编码格式"
               >
@@ -296,7 +329,12 @@
                     v-model="exportConfig.insert.before"
                   ></a-input>
                 </div>
-                <a-button type="defalut" class="primary-btn" @click="insertEnter(0)">插入</a-button>
+                <a-button
+                  type="defalut"
+                  class="primary-btn"
+                  @click="insertEnter(0)"
+                  >插入</a-button
+                >
               </div>
               <div style="margin-top: 15px" class="input-group">
                 <div class="input-title">段尾</div>
@@ -307,7 +345,12 @@
                     v-model="exportConfig.insert.after"
                   ></a-input>
                 </div>
-                <a-button type="defalut" class="primary-btn" @click="insertEnter(1)">插入</a-button>
+                <a-button
+                  type="defalut"
+                  class="primary-btn"
+                  @click="insertEnter(1)"
+                  >插入</a-button
+                >
               </div>
             </div>
           </div>
@@ -332,43 +375,43 @@
                     placeholder="请选择原文语种"
                   >
                     <a-select-option value="zh-HK">
-                      中文- 中国香港
+                      zh-HK（中文- 中国香港）
                     </a-select-option>
                     <a-select-option value="zh-MO">
-                      中文 - 中国澳门
+                      zh-MO（中文 - 中国澳门）
                     </a-select-option>
                     <a-select-option value="zh-CN">
-                      中文 -中国
+                      zh-CN（中文 -中国）
                     </a-select-option>
                     <a-select-option value="zh-TW">
-                      中文 -中国台湾
+                      zh-TW（中文 -中国台湾）
                     </a-select-option>
                     <a-select-option value="en-GB">
-                      英语 - 英国
+                      en-GB（英语 - 英国）
                     </a-select-option>
                     <a-select-option value="en-US">
-                      英语 - 美国
+                      en-US（英语 - 美国）
                     </a-select-option>
                     <a-select-option value="fr-FR">
-                      法语 -法国
+                      fr-FR（法语 -法国）
                     </a-select-option>
                     <a-select-option value="de-DE">
-                      德语 -德国
+                      de-DE（德语 -德国）
                     </a-select-option>
                     <a-select-option value="it-IT">
-                      意大利语 -意大利
+                      it-IT（意大利语 -意大利）
                     </a-select-option>
                     <a-select-option value="ja-JP">
-                      日语 -日本
+                      ja-JP（日语 -日本）
                     </a-select-option>
                     <a-select-option value="ko-KR">
-                      韩语 -韩国
+                      ko-KR（韩语 -韩国）
                     </a-select-option>
                     <a-select-option value="ru-RU">
-                      俄语 -俄国
+                      ru-RU（俄语 -俄国）
                     </a-select-option>
                     <a-select-option value="es-ES">
-                      西班牙语 -西班牙
+                      es-ES（西班牙语 -西班牙）
                     </a-select-option>
                   </a-select>
                 </div>
@@ -387,43 +430,43 @@
                     placeholder="请选择译文语种"
                   >
                     <a-select-option value="zh-HK">
-                      中文- 中国香港
+                      zh-HK（中文- 中国香港）
                     </a-select-option>
                     <a-select-option value="zh-MO">
-                      中文 - 中国澳门
+                      zh-MO（中文 - 中国澳门）
                     </a-select-option>
                     <a-select-option value="zh-CN">
-                      中文 -中国
+                      zh-CN（中文 -中国）
                     </a-select-option>
                     <a-select-option value="zh-TW">
-                      中文 -中国台湾
+                      zh-TW（中文 -中国台湾）
                     </a-select-option>
                     <a-select-option value="en-GB">
-                      英语 - 英国
+                      en-GB（英语 - 英国）
                     </a-select-option>
                     <a-select-option value="en-US">
-                      英语 - 美国
+                      en-US（英语 - 美国）
                     </a-select-option>
                     <a-select-option value="fr-FR">
-                      法语 -法国
+                      fr-FR（法语 -法国）
                     </a-select-option>
                     <a-select-option value="de-DE">
-                      德语 -德国
+                      de-DE（德语 -德国）
                     </a-select-option>
                     <a-select-option value="it-IT">
-                      意大利语 -意大利
+                      it-IT（意大利语 -意大利）
                     </a-select-option>
                     <a-select-option value="ja-JP">
-                      日语 -日本
+                      ja-JP（日语 -日本）
                     </a-select-option>
                     <a-select-option value="ko-KR">
-                      韩语 -韩国
+                      ko-KR（韩语 -韩国）
                     </a-select-option>
                     <a-select-option value="ru-RU">
-                      俄语 -俄国
+                      ru-RU（俄语 -俄国）
                     </a-select-option>
                     <a-select-option value="es-ES">
-                      西班牙语 -西班牙
+                      es-ES（西班牙语 -西班牙）
                     </a-select-option>
                   </a-select>
                 </div>
@@ -435,7 +478,7 @@
     </div>
     <a-modal
       v-model="modal.visible"
-      title="导出"
+      title="保存"
       ok-text="确认"
       cancel-text="取消"
       @cancel="hideModal"
@@ -459,7 +502,7 @@
           </a-select>
         </div>
       </div>
-      <div v-if="exportConfig.suffix === 'txt'" class="input-group">
+      <div class="input-group">
         <div class="input-title">编码格式</div>
         <div class="input-value">
           <a-select
@@ -486,19 +529,45 @@
             style="width: 320px"
             placeholder="请选择原文语种"
           >
-            <a-select-option value="zh-HK"> 中文- 中国香港 </a-select-option>
-            <a-select-option value="zh-MO"> 中文 - 中国澳门 </a-select-option>
-            <a-select-option value="zh-CN"> 中文 -中国 </a-select-option>
-            <a-select-option value="zh-TW"> 中文 -中国台湾 </a-select-option>
-            <a-select-option value="en-GB"> 英语 - 英国 </a-select-option>
-            <a-select-option value="en-US"> 英语 - 美国 </a-select-option>
-            <a-select-option value="fr-FR"> 法语 -法国 </a-select-option>
-            <a-select-option value="de-DE"> 德语 -德国 </a-select-option>
-            <a-select-option value="it-IT"> 意大利语 -意大利 </a-select-option>
-            <a-select-option value="ja-JP"> 日语 -日本 </a-select-option>
-            <a-select-option value="ko-KR"> 韩语 -韩国 </a-select-option>
-            <a-select-option value="ru-RU"> 俄语 -俄国 </a-select-option>
-            <a-select-option value="es-ES"> 西班牙语 -西班牙 </a-select-option>
+            <a-select-option value="zh-HK">
+              zh-HK（中文- 中国香港）
+            </a-select-option>
+            <a-select-option value="zh-MO">
+              zh-MO（中文 - 中国澳门）
+            </a-select-option>
+            <a-select-option value="zh-CN">
+              zh-CN（中文 -中国）
+            </a-select-option>
+            <a-select-option value="zh-TW">
+              zh-TW（中文 -中国台湾）
+            </a-select-option>
+            <a-select-option value="en-GB">
+              en-GB（英语 - 英国）
+            </a-select-option>
+            <a-select-option value="en-US">
+              en-US（英语 - 美国）
+            </a-select-option>
+            <a-select-option value="fr-FR">
+              fr-FR（法语 -法国）
+            </a-select-option>
+            <a-select-option value="de-DE">
+              de-DE（德语 -德国）
+            </a-select-option>
+            <a-select-option value="it-IT">
+              it-IT（意大利语 -意大利）
+            </a-select-option>
+            <a-select-option value="ja-JP">
+              ja-JP（日语 -日本）
+            </a-select-option>
+            <a-select-option value="ko-KR">
+              ko-KR（韩语 -韩国）
+            </a-select-option>
+            <a-select-option value="ru-RU">
+              ru-RU（俄语 -俄国）
+            </a-select-option>
+            <a-select-option value="es-ES">
+              es-ES（西班牙语 -西班牙）
+            </a-select-option>
           </a-select>
         </div>
       </div>
@@ -515,19 +584,45 @@
             style="width: 320px"
             placeholder="请选择原文语种"
           >
-            <a-select-option value="zh-HK"> 中文- 中国香港 </a-select-option>
-            <a-select-option value="zh-MO"> 中文 - 中国澳门 </a-select-option>
-            <a-select-option value="zh-CN"> 中文 -中国 </a-select-option>
-            <a-select-option value="zh-TW"> 中文 -中国台湾 </a-select-option>
-            <a-select-option value="en-GB"> 英语 - 英国 </a-select-option>
-            <a-select-option value="en-US"> 英语 - 美国 </a-select-option>
-            <a-select-option value="fr-FR"> 法语 -法国 </a-select-option>
-            <a-select-option value="de-DE"> 德语 -德国 </a-select-option>
-            <a-select-option value="it-IT"> 意大利语 -意大利 </a-select-option>
-            <a-select-option value="ja-JP"> 日语 -日本 </a-select-option>
-            <a-select-option value="ko-KR"> 韩语 -韩国 </a-select-option>
-            <a-select-option value="ru-RU"> 俄语 -俄国 </a-select-option>
-            <a-select-option value="es-ES"> 西班牙语 -西班牙 </a-select-option>
+            <a-select-option value="zh-HK">
+              zh-HK（中文- 中国香港）
+            </a-select-option>
+            <a-select-option value="zh-MO">
+              zh-MO（中文 - 中国澳门）
+            </a-select-option>
+            <a-select-option value="zh-CN">
+              zh-CN（中文 -中国）
+            </a-select-option>
+            <a-select-option value="zh-TW">
+              zh-TW（中文 -中国台湾）
+            </a-select-option>
+            <a-select-option value="en-GB">
+              en-GB（英语 - 英国）
+            </a-select-option>
+            <a-select-option value="en-US">
+              en-US（英语 - 美国）
+            </a-select-option>
+            <a-select-option value="fr-FR">
+              fr-FR（法语 -法国）
+            </a-select-option>
+            <a-select-option value="de-DE">
+              de-DE（德语 -德国）
+            </a-select-option>
+            <a-select-option value="it-IT">
+              it-IT（意大利语 -意大利）
+            </a-select-option>
+            <a-select-option value="ja-JP">
+              ja-JP（日语 -日本）
+            </a-select-option>
+            <a-select-option value="ko-KR">
+              ko-KR（韩语 -韩国）
+            </a-select-option>
+            <a-select-option value="ru-RU">
+              ru-RU（俄语 -俄国）
+            </a-select-option>
+            <a-select-option value="es-ES">
+              es-ES（西班牙语 -西班牙）
+            </a-select-option>
           </a-select>
         </div>
       </div>
@@ -550,7 +645,7 @@
     </a-modal>
     <a-modal
       v-model="addModal.visible"
-      title="导出"
+      title="保存"
       ok-text="确认"
       cancel-text="取消"
       @cancel="hideAddModal"
@@ -597,7 +692,7 @@ import { setTimeout, clearTimeout } from "timers";
 import path from "path";
 import { ipcRenderer } from "electron";
 export default {
-  data() {
+  data () {
     const downUrl = this.$db
       .read()
       .get("export.defaultUrl")
@@ -605,7 +700,9 @@ export default {
     return {
       drawer: {
         visible0: false,
+        zIndex0: 300,
         visible1: false,
+        zIndex1: 300,
       },
       downUrl: downUrl || exportService.getDownPath(),
       modal: {
@@ -619,6 +716,7 @@ export default {
       panes: [],
       newTabIndex: 0,
       activeKey: null,
+      isLogin: false,
       scrollValue: 0,
       exportConfig: {
         suffix: "txt",
@@ -642,7 +740,13 @@ export default {
       },
     };
   },
-  created() {
+  created () {
+    this.isLogin = this.$db.read().get('userId').value();
+    this.$bus.on('login', () => {
+      this.isLogin = this.$db.read().get('userId').value();
+      console.log(this.isLogin, this.panes);
+      this.initReady();
+    })
     this.initWorker();
     this.$bus.on("exitPrve", () => {
       const pane = this.panes.find((d) => d.key == this.activeKey);
@@ -683,79 +787,59 @@ export default {
       //   clearTimeout(timer);
       // }
       // timer = setTimeout(() => {
-        const pane = this.panes.find((d) => d.key == this.activeKey);
-        if (
-          [
-            "tmx",
-            "tbx",
-            "xliff",
-            "sdlxliff",
-            "docx",
-            "xlsx",
-            "ass",
-            "srt",
-          ].includes(pane.title.substring(pane.title.lastIndexOf(".") + 1))
-        ) {
-          this.$message.destroy();
-          this.$message.error("结构化数据，不能保存回源文件");
-          return false;
-        }
-        if (pane && pane.path) {
-          this.saveFun(
-            pane,
-            {
-              suffix: pane.title.substring(pane.title.lastIndexOf(".") + 1),
-              format: "utf8",
-              name: pane.title.substring(0, pane.title.lastIndexOf(".")),
-              separate: {
-                character: "",
-                type: 0,
-              },
-              langObj: {
-                source: "zh-CN",
-                target: "en-US",
-              },
-              lang: {
-                isEn: true,
-                isZh: true,
-              },
-              insert: {
-                before: "",
-                after: "",
-              },
+      const pane = this.panes.find((d) => d.key == this.activeKey);
+      if (
+        [
+          "tmx",
+          "tbx",
+          "xliff",
+          "sdlxliff",
+          "docx",
+          "xlsx",
+          "ass",
+          "srt",
+        ].includes(pane.title.substring(pane.title.lastIndexOf(".") + 1))
+      ) {
+        this.$message.destroy();
+        this.$message.error("结构化数据，不能保存回源文件");
+        return false;
+      }
+      if (pane && pane.path) {
+        this.saveFun(
+          pane,
+          {
+            suffix: pane.title.substring(pane.title.lastIndexOf(".") + 1),
+            format: "utf8",
+            name: pane.title.substring(0, pane.title.lastIndexOf(".")),
+            separate: {
+              character: "",
+              type: 0,
             },
-            pane.path
-          );
-        } else {
-          this.addModal.visible = true;
-          this.addModal.placeholder = pane.title;
-        }
+            langObj: {
+              source: "zh-CN",
+              target: "en-US",
+            },
+            lang: {
+              isEn: true,
+              isZh: true,
+            },
+            insert: {
+              before: "",
+              after: "",
+            },
+          },
+          pane.path
+        );
+      } else {
+        this.addModal.visible = true;
+        this.addModal.placeholder = pane.title;
+      }
       // }, 200);
     });
   },
-  mounted() {
+  mounted () {
     let timer = null;
-    const panes = this.$db
-      .read()
-      .get("transform.tabs")
-      .value();
-    const activeKey = this.$db
-      .read()
-      .get("transform.activeKey")
-      .value();
-    (panes || []).forEach((item) => {
-      item.domRef = "domRef" + item.key;
-      const data = this.$dbMap
-        .get(item.key)
-        .read()
-        .get("data")
-        .value();
-      item = Object.assign(item, data || {});
-    });
-    this.panes = panes || [];
-    this.activeKey = activeKey || (panes && panes.length > 0 && panes[0].key);
-    this.initEditor();
-    this.initHandles();
+    this.initReady();
     this.$bus.on("export", () => {
       if (timer) {
         clearTimeout(timer);
@@ -773,15 +857,21 @@ export default {
   },
   watch: {
     $route: {
-      handler(to) {
-        const panes = this.$db
+      handler (to) {
+        const tabs = this.$db
           .read()
           .get("transform.tabs")
           .value();
-        const activeKey = this.$db
+        const userName = this.$db.read().get('userInfo.name').value();
+        const panes = (tabs || []).filter(d => d.user === userName);
+        let activeKey = this.$db
           .read()
           .get("transform.activeKey")
           .value();
+        const keyIndex = panes.findIndex(d => d.key === activeKey);
+        if (keyIndex === -1 && panes.length > 0) {
+          activeKey = panes[0].key;
+        }
         this.panes = panes.map((item) => {
           delete item.editor;
           item.domRef = "domRef" + item.key;
@@ -799,7 +889,7 @@ export default {
       },
       deep: true,
     },
-    activeKey(val) {
+    activeKey (val) {
       this.$db
         .read()
         .set("transform.activeKey", val)
@@ -812,11 +902,46 @@ export default {
     },
   },
   methods: {
-    showDrawer(type) {
-      this.$ipcRenderer.send('timer.refresh');
-      this.drawer["visible" + type] = !this.drawer["visible" + type];
+    initReady () {
+      let timer = null;
+      const tabs = this.$db
+        .read()
+        .get("transform.tabs")
+        .value();
+      const userName = this.$db.read().get('userInfo.name').value();
+      const panes = (tabs || []).filter(d => d.user === userName);
+      let activeKey = this.$db
+        .read()
+        .get("transform.activeKey")
+        .value();
+      const keyIndex = panes.findIndex(d => d.key === activeKey);
+      if (keyIndex === -1 && panes.length > 0) {
+        activeKey = panes[0].key;
+      }
+      (panes || []).forEach((item) => {
+        item.domRef = "domRef" + item.key;
+        const data = this.$dbMap
+          .get(item.key)
+          .read()
+          .get("data")
+          .value();
+        item = Object.assign(item, data || {});
+      });
+      this.panes = panes || [];
+      this.activeKey = activeKey || (panes && panes.length > 0 && panes[0].key);
+      this.initEditor();
+      this.initHandles();
     },
-    initWorker() {
+    showDrawer (type) {
+      this.$ipcRenderer.send("timer.refresh");
+      this.drawer.zIndex0 = 300;
+      this.drawer.zIndex1 = 300;
+      this.drawer["visible" + type] = !this.drawer["visible" + type];
+      if (this.drawer["visible" + type]) {
+        this.drawer["zIndex" + type] = 301;
+      }
+    },
+    initWorker () {
       const that = this;
       setTimeout(() => {
         this.$ipcRenderer.send("clearPanes", {
@@ -829,7 +954,7 @@ export default {
         }
       });
     },
-    initHandles() {
+    initHandles () {
       const pane = this.panes.find((d) => d.key == this.activeKey);
       console.log(this.panes);
       if (this.panes && this.panes.length > 0) {
@@ -945,8 +1070,8 @@ export default {
         ]);
       }
     },
-    selectFolder() {
-      this.$ipcRenderer.send('timer.refresh');
+    selectFolder () {
+      this.$ipcRenderer.send("timer.refresh");
       const url = electron.remote.dialog.showOpenDialogSync({
         properties: ["openDirectory"],
       });
@@ -955,23 +1080,23 @@ export default {
         this.$db.set("export.defaultUrl", url[0]).write();
       }
     },
-    changeTab() {
-      this.$ipcRenderer.send('timer.refresh');
+    changeTab () {
+      this.$ipcRenderer.send("timer.refresh");
       this.modal.visible = false;
       this.drawer.visible0 = false;
       this.drawer.visible1 = false;
       this.scrollValue = 0;
     },
-    hideModal() {
-      this.$ipcRenderer.send('timer.refresh');
+    hideModal () {
+      this.$ipcRenderer.send("timer.refresh");
       this.modal.visible = false;
     },
-    hideAddModal() {
-      this.$ipcRenderer.send('timer.refresh');
+    hideAddModal () {
+      this.$ipcRenderer.send("timer.refresh");
       this.addModal.visible = false;
     },
-    clearSpace() {
-      this.$ipcRenderer.send('timer.refresh');
+    clearSpace () {
+      this.$ipcRenderer.send("timer.refresh");
       const pane = this.panes.find((d) => d.key == this.activeKey);
       if (pane) {
         const selectText = pane.editor.getSelection();
@@ -984,8 +1109,8 @@ export default {
         }
       }
     },
-    clearNotes() {
-      this.$ipcRenderer.send('timer.refresh');
+    clearNotes () {
+      this.$ipcRenderer.send("timer.refresh");
       const pane = this.panes.find((d) => d.key == this.activeKey);
       let text = pane.editor.getValue();
       if (pane) {
@@ -996,21 +1121,22 @@ export default {
         });
         this.$refs.wordRef.removeChild(this.$refs.wordRef.querySelector("ol"));
         this.setEditValue(pane, text);
+        this.$message.destroy();
         this.$message.success("已完成所有脚注、尾注内容的清理");
       }
     },
-    clickButtonFile() {
-      this.$ipcRenderer.send('timer.refresh');
+    clickButtonFile () {
+      this.$ipcRenderer.send("timer.refresh");
       this.$bus.emit("openfile");
     },
-    exportOk() {
-      this.$ipcRenderer.send('timer.refresh');
+    exportOk () {
+      this.$ipcRenderer.send("timer.refresh");
       const pane = this.panes.find((d) => d.key == this.activeKey);
       this.modal.visible = false;
       this.exportFunc(pane);
     },
-    exportAddOk() {
-      this.$ipcRenderer.send('timer.refresh');
+    exportAddOk () {
+      this.$ipcRenderer.send("timer.refresh");
       const pane = this.panes.find((d) => d.key == this.activeKey);
       this.addModal.visible = false;
       this.panes.forEach((item) => {
@@ -1038,6 +1164,7 @@ export default {
             ".txt",
         },
       });
+      console.log(pane.editor.getValue())
       this.saveFun(
         pane,
         {
@@ -1064,14 +1191,14 @@ export default {
           },
         },
         this.downUrl +
-          path.sep +
-          (this.addModal.fileName ||
-            pane.title.substring(0, pane.title.lastIndexOf("."))) +
-          ".txt"
+        path.sep +
+        (this.addModal.fileName ||
+          pane.title.substring(0, pane.title.lastIndexOf("."))) +
+        ".txt"
       );
     },
-    clearMark() {
-      this.$ipcRenderer.send('timer.refresh');
+    clearMark () {
+      this.$ipcRenderer.send("timer.refresh");
       const pane = this.panes.find((d) => d.key == this.activeKey);
       let text = pane.editor.getValue();
       if (pane) {
@@ -1085,18 +1212,19 @@ export default {
         });
 
         this.setEditValue(pane, text);
+        this.$message.destroy();
         this.$message.success("已完成所有上标、下标符号的清理");
       }
     },
-    saveFun(pane, config, savePath) {
-      this.$ipcRenderer.send('timer.refresh');
+    saveFun (pane, config, savePath) {
+      this.$ipcRenderer.send("timer.refresh");
       switch (config.suffix) {
         case "tmx":
           exportService
             .exportTmx(config, pane.editor.getValue(), savePath, true)
             .then(({ name, path }) => {
               this.$notification.success({
-                message: "导出成功",
+                message: "保存成功",
                 duration: 5,
                 description: name + "文件已导出文件夹:[ " + path + " ]",
               });
@@ -1107,7 +1235,7 @@ export default {
             .exportTbx(config, pane.editor.getValue(), savePath, true)
             .then(({ name, path }) => {
               this.$notification.success({
-                message: "导出成功",
+                message: "保存成功",
                 duration: 5,
                 description: name + "文件已导出文件夹:[ " + path + " ]",
               });
@@ -1118,7 +1246,7 @@ export default {
             .exportTxt(config, pane.editor.getValue(), savePath, true)
             .then(({ name, path }) => {
               this.$notification.success({
-                message: "导出成功",
+                message: "保存成功",
                 duration: 5,
                 description: name + "文件已导出文件夹:[ " + path + " ]",
               });
@@ -1129,7 +1257,7 @@ export default {
             .exportDocx(config, pane.editor.getValue(), savePath, true)
             .then(({ name, path }) => {
               this.$notification.success({
-                message: "导出成功",
+                message: "保存成功",
                 duration: 5,
                 description: name + "文件已导出文件夹:[ " + path + " ]",
               });
@@ -1140,7 +1268,7 @@ export default {
             .exportXliff(config, pane.editor.getValue(), savePath, true)
             .then(({ name, path }) => {
               this.$notification.success({
-                message: "导出成功",
+                message: "保存成功",
                 duration: 5,
                 description: name + "文件已导出文件夹:[ " + path + " ]",
               });
@@ -1151,7 +1279,7 @@ export default {
             .exportXlsx(config, pane.editor.getValue(), savePath, true)
             .then(({ name, path }) => {
               this.$notification.success({
-                message: "导出成功",
+                message: "保存成功",
                 duration: 5,
                 description: name + "文件已导出文件夹:[ " + path + " ]",
               });
@@ -1159,8 +1287,8 @@ export default {
           break;
       }
     },
-    exportFunc(pane) {
-      this.$ipcRenderer.send('timer.refresh');
+    exportFunc (pane) {
+      this.$ipcRenderer.send("timer.refresh");
       this.exportConfig.name = pane.title.substring(
         0,
         pane.title.lastIndexOf(".")
@@ -1171,7 +1299,7 @@ export default {
             .exportTmx(this.exportConfig, pane.editor.getValue(), this.downUrl)
             .then(({ name, path }) => {
               this.$notification.success({
-                message: "导出成功",
+                message: "保存成功",
                 duration: 5,
                 description: name + "文件已导出文件夹:[ " + path + " ]",
               });
@@ -1182,7 +1310,7 @@ export default {
             .exportTbx(this.exportConfig, pane.editor.getValue(), this.downUrl)
             .then(({ name, path }) => {
               this.$notification.success({
-                message: "导出成功",
+                message: "保存成功",
                 duration: 5,
                 description: name + "文件已导出文件夹:[ " + path + " ]",
               });
@@ -1193,7 +1321,7 @@ export default {
             .exportTxt(this.exportConfig, pane.editor.getValue(), this.downUrl)
             .then(({ name, path }) => {
               this.$notification.success({
-                message: "导出成功",
+                message: "保存成功",
                 duration: 5,
                 description: name + "文件已导出文件夹:[ " + path + " ]",
               });
@@ -1204,7 +1332,7 @@ export default {
             .exportDocx(this.exportConfig, pane.editor.getValue(), this.downUrl)
             .then(({ name, path }) => {
               this.$notification.success({
-                message: "导出成功",
+                message: "保存成功",
                 duration: 5,
                 description: name + "文件已导出文件夹:[ " + path + " ]",
               });
@@ -1219,7 +1347,7 @@ export default {
             )
             .then(({ name, path }) => {
               this.$notification.success({
-                message: "导出成功",
+                message: "保存成功",
                 duration: 5,
                 description: name + "文件已导出文件夹:[ " + path + " ]",
               });
@@ -1230,7 +1358,7 @@ export default {
             .exportXlsx(this.exportConfig, pane.editor.getValue(), this.downUrl)
             .then(({ name, path }) => {
               this.$notification.success({
-                message: "导出成功",
+                message: "保存成功",
                 duration: 5,
                 description: name + "文件已导出文件夹:[ " + path + " ]",
               });
@@ -1238,8 +1366,8 @@ export default {
           break;
       }
     },
-    mergeEnter(type) {
-      this.$ipcRenderer.send('timer.refresh');
+    mergeEnter (type) {
+      this.$ipcRenderer.send("timer.refresh");
       const pane = this.panes.find((d) => d.key == this.activeKey);
       if (pane) {
         const selectText = pane.editor.getSelection();
@@ -1281,16 +1409,17 @@ export default {
           }
         }
       }
+      this.$message.destroy();
       this.$message.success(
         type === 0
           ? "已完成回车分段合并"
           : type === 1
-          ? "已完成回车分段合并"
-          : "已完成"
+            ? "已完成回车分段合并"
+            : "已完成"
       );
     },
-    changeChart(type) {
-      this.$ipcRenderer.send('timer.refresh');
+    changeChart (type) {
+      this.$ipcRenderer.send("timer.refresh");
       const pane = this.panes.find((d) => d.key == this.activeKey);
       if (pane) {
         const selectText = pane.editor.getSelection();
@@ -1317,6 +1446,7 @@ export default {
           });
           // pane.editor.setValue(resultTxt);
           this.setEditValue(pane, resultTxt);
+          this.$message.destroy();
           this.$message.success(
             type === "ToCDB" ? "已全部转成半角符号" : "已全部转成全角符号"
           );
@@ -1324,8 +1454,8 @@ export default {
       }
     },
     // 全角转半角
-    ToCDB(str) {
-      this.$ipcRenderer.send('timer.refresh');
+    ToCDB (str) {
+      this.$ipcRenderer.send("timer.refresh");
       var tmp = "";
       for (var i = 0; i < str.length; i++) {
         if (str.charCodeAt(i) > 65248 && str.charCodeAt(i) < 65375) {
@@ -1336,8 +1466,8 @@ export default {
       }
       return tmp;
     },
-    ToDBC(txtstring) {
-      this.$ipcRenderer.send('timer.refresh');
+    ToDBC (txtstring) {
+      this.$ipcRenderer.send("timer.refresh");
       var tmp = "";
       for (var i = 0; i < txtstring.length; i++) {
         if (txtstring.charCodeAt(i) == 32) {
@@ -1348,8 +1478,8 @@ export default {
       }
       return tmp;
     },
-    toUpperCase() {
-      this.$ipcRenderer.send('timer.refresh');
+    toUpperCase () {
+      this.$ipcRenderer.send("timer.refresh");
       const pane = this.panes.find((d) => d.key == this.activeKey);
       if (pane) {
         const selectText = pane.editor.getSelection();
@@ -1363,12 +1493,13 @@ export default {
         } else {
           // pane.editor.setValue(text.toUpperCase());
           this.setEditValue(pane, text.toUpperCase());
+          this.$message.destroy();
           this.$message.success("已全部转成全大写");
         }
       }
     },
-    toLowerCase() {
-      this.$ipcRenderer.send('timer.refresh');
+    toLowerCase () {
+      this.$ipcRenderer.send("timer.refresh");
       const pane = this.panes.find((d) => d.key == this.activeKey);
       if (pane) {
         const selectText = pane.editor.getSelection();
@@ -1382,12 +1513,13 @@ export default {
         } else {
           // pane.editor.setValue(text.toLowerCase());
           this.setEditValue(pane, text.toLowerCase());
+          this.$message.destroy();
           this.$message.success("已全部转成全小写");
         }
       }
     },
-    clearPBefore() {
-      this.$ipcRenderer.send('timer.refresh');
+    clearPBefore () {
+      this.$ipcRenderer.send("timer.refresh");
       const pane = this.panes.find((d) => d.key == this.activeKey);
       if (pane) {
         const selectText = pane.editor.getSelection();
@@ -1418,12 +1550,13 @@ export default {
           );
           // pane.editor.setValue(newTxt);
           this.setEditValue(pane, newTxt);
+          this.$message.destroy();
           this.$message.success("已完成段首编号的清理");
         }
       }
     },
-    clearEnter() {
-      this.$ipcRenderer.send('timer.refresh');
+    clearEnter () {
+      this.$ipcRenderer.send("timer.refresh");
       const pane = this.panes.find((d) => d.key == this.activeKey);
       if (pane) {
         const selectText = pane.editor.getSelection();
@@ -1444,10 +1577,11 @@ export default {
           // pane.editor.setValue(newText);
           this.setEditValue(pane, newText);
         }
+        this.$message.destroy();
         this.$message.success("已完成所有空白行的清理");
       }
     },
-    initEditor() {
+    initEditor () {
       const panes = this.panes;
       this.panes = [];
       setTimeout(() => {
@@ -1471,7 +1605,24 @@ export default {
                 onCursorActivity: (instance) => {
                   console.log(instance);
                 },
+                extraKeys: {
+                  "Ctrl-Z": () => {
+                    const historys = item.editor.historySize();
+                    if (historys.undo > 1) {
+                      item.editor.undo();
+                    }
+                  },
+                  "Cmd-Z": () => {
+                    const historys = item.editor.historySize();
+                    if (historys.undo > 1) {
+                      item.editor.undo();
+                    }
+                  },
+                },
               });
+              // item.editor.addKeyMap({
+              //   'CTRL'
+              // })
               if (item.type === "docx") {
                 this.$refs.wordRef.innerHTML = item.html;
               }
@@ -1479,7 +1630,7 @@ export default {
               item.editor.save();
               let timer = null;
               item.editor.on("change", (Editor, changes) => {
-                this.$ipcRenderer.send('timer.refresh');
+                this.$ipcRenderer.send("timer.refresh");
                 if (timer) {
                   clearTimeout(timer);
                 }
@@ -1506,15 +1657,15 @@ export default {
         }, 20);
       });
     },
-    setEditValue(pane, content) {
+    setEditValue (pane, content) {
       const scrollTop = pane.editor.display.scroller.scrollTop;
       pane.editor.setValue(content);
       setTimeout(() => {
         pane.editor.display.scroller.scrollTop = scrollTop;
       });
     },
-    insertSp() {
-      this.$ipcRenderer.send('timer.refresh');
+    insertSp () {
+      this.$ipcRenderer.send("timer.refresh");
       const pane = this.panes.find((d) => d.key == this.activeKey);
       if (pane) {
         const text = pane.editor.getValue();
@@ -1536,13 +1687,14 @@ export default {
             );
           });
           this.setEditValue(pane, result.join("\n"));
+          this.$message.destroy();
           this.$message.success("已完成所有空格的插入");
           // pane.editor.setValue(result.join("\n"));
         }
       }
     },
-    insertEnter(type) {
-      this.$ipcRenderer.send('timer.refresh');
+    insertEnter (type) {
+      this.$ipcRenderer.send("timer.refresh");
       const pane = this.panes.find((d) => d.key == this.activeKey);
       if (pane) {
         const text = pane.editor.getValue();
@@ -1565,8 +1717,8 @@ export default {
 
       // text.
     },
-    deleteEnter(type) {
-      this.$ipcRenderer.send('timer.refresh');
+    deleteEnter (type) {
+      this.$ipcRenderer.send("timer.refresh");
       const pane = this.panes.find((d) => d.key == this.activeKey);
       if (pane) {
         const text = pane.editor.getValue();
@@ -1587,6 +1739,7 @@ export default {
             console.log(str);
             this.setEditValue(pane, str);
           }
+          this.$message.destroy();
           this.$message.success(
             type === 0 ? "已完成所有段首空白的清理" : "已完成所有段尾空白的清理"
           );
@@ -1607,7 +1760,7 @@ export default {
             });
             this.setEditValue(pane, str);
           }
-
+          this.$message.destroy();
           this.$message.success(
             type === 0 ? "已完成所有段首空白的清理" : "已完成所有段尾空白的清理"
           );
@@ -1615,17 +1768,17 @@ export default {
         }
       }
     },
-    getSelectText(pane) {
+    getSelectText (pane) {
       console.log(pane.editor.getSelection());
     },
-    callback(key) {
+    callback (key) {
       console.log(key);
     },
-    onEdit(targetKey, action) {
+    onEdit (targetKey, action) {
       this[action](targetKey);
     },
-    add() {
-      this.$ipcRenderer.send('timer.refresh');
+    add () {
+      this.$ipcRenderer.send("timer.refresh");
       const panes = this.panes;
       const key = new Date().getTime();
       const activeKey = key;
@@ -1642,29 +1795,37 @@ export default {
         })
         .write();
       this.activeKey = activeKey;
+      const editTabs = this.$db.read().get('transform.tabs').value();
+      editTabs.push({
+        title: `Untitled-${this.panes.length + 1}.txt`,
+        domRef: "domRef" + activeKey,
+        key: activeKey,
+      });
       const result = panes.map((item) => {
         delete item.editor;
         return item;
       });
       this.panes = result;
       this.$db.set("transform.activeKey", activeKey).write();
-      this.$db.set("transform.tabs", result).write();
+      this.$db.set("transform.tabs", editTabs).write();
       setTimeout(() => {
         this.initEditor();
       }, 50);
     },
-    remove(targetKey) {
-      this.$ipcRenderer.send('timer.refresh');
+    remove (targetKey) {
+      this.$ipcRenderer.send("timer.refresh");
       let activeKey = this.activeKey;
       try {
         this.$dbMap.delete(targetKey);
-      } catch (e) {}
+      } catch (e) { }
       let lastIndex;
       this.panes.forEach((pane, i) => {
         if (pane.key === targetKey) {
           lastIndex = i - 1;
         }
       });
+      let editTabs = this.$db.read().get('transform.tabs').value();
+      editTabs = editTabs.filter((pane) => pane.key !== targetKey);
       const panes = this.panes.filter((pane) => pane.key !== targetKey);
       if (panes.length && activeKey === targetKey) {
         if (lastIndex >= 0) {
@@ -1684,7 +1845,7 @@ export default {
       this.initHandles();
       this.initEditor();
       this.$db.set("transform.activeKey", activeKey).write();
-      this.$db.set("transform.tabs", result).write();
+      this.$db.set("transform.tabs", editTabs).write();
     },
   },
 };

@@ -8,23 +8,23 @@ const fxp = require("fast-xml-parser");
 const xlsx = require("node-xlsx");
 const uuid = require("uuid");
 const { isAutoLogout } = require("../utils/api");
-function sendMessage(action, data) {
+function sendMessage (action, data) {
   ipcRenderer.send("message-from-worker", {
     action: action,
     res: data,
   });
 }
 
-function getXlsxContent(pathUrl) {
+function getXlsxContent (pathUrl) {
   return new Promise((resolve, reject) => {
     var list = xlsx.parse(pathUrl);
     resolve(list);
   });
 }
-function createJSONByXlsx(pathUrl) {
+function createJSONByXlsx (pathUrl) {
   return xlsx.parse(fs.readFileSync(pathUrl));
 }
-function openXlsxData(url, editTabs, params, key) {
+function openXlsxData (url, editTabs, params, key) {
   const json = createJSONByXlsx(url);
   const result = [];
   json.forEach((item) => {
@@ -36,9 +36,11 @@ function openXlsxData(url, editTabs, params, key) {
   result.forEach((item) => {
     content.push(item.join("\n"));
   });
+  const userName = db.read().get('userInfo.name').value();
   editTabs.push({
     title: params.name,
     path: url,
+    user: userName,
     key,
   });
   dbMap
@@ -62,8 +64,9 @@ function openXlsxData(url, editTabs, params, key) {
   });
 }
 
-function openXmlData(xmlData, url, editTabs, params, format, key) {
+function openXmlData (xmlData, url, editTabs, params, format, key) {
   editTabs = editTabs || [];
+  console.log(xmlData);
   const json = fxp.parse(xmlData);
   console.log(json, format);
   const result = [];
@@ -120,9 +123,11 @@ function openXmlData(xmlData, url, editTabs, params, format, key) {
   result.forEach((item) => {
     content.push(item.join("\n"));
   });
+  const userName = db.read().get('userInfo.name').value();
   editTabs.push({
     title: params.name,
     path: url,
+    user: userName,
     key,
   });
   dbMap
@@ -146,7 +151,7 @@ function openXmlData(xmlData, url, editTabs, params, format, key) {
   });
 }
 
-function getFileContent(pathUrl, isBuffer) {
+function getFileContent (pathUrl, isBuffer) {
   return new Promise((resolve, reject) => {
     const format = pathUrl.substring(pathUrl.lastIndexOf(".") + 1);
     fs.readFile(pathUrl, (err, con) => {
@@ -188,17 +193,22 @@ function getFileContent(pathUrl, isBuffer) {
     });
   });
 }
-function getTxtContent(path, format) {
+function getTxtContent (path, format) {
   return new Promise((resolve, reject) => {
     fs.readFile(path, (err, con) => {
       const chart = jschardet.detect(con);
       let data = "";
+      console.log(chart);
+
       if (["UTF-8"].includes(chart.encoding)) {
-        // resolve(con.toString());
+        // resolve(con);
         data = con.toString();
-      } else {
+      } else if (chart.encoding) {
+        console.log(con);
         data = iconv.decode(con, chart.encoding);
         // resolve(iconv.decode(con, chart.encoding));
+      } else {
+        data = con.toString();
       }
       if (format === "srt") {
         // data = data.replace(/^[0-9]+\s*$/gm, "");
@@ -224,7 +234,7 @@ function getTxtContent(path, format) {
   });
 }
 
-function getWordContent(path) {
+function getWordContent (path) {
   console.log(path);
   return new Promise((resolve, reject) => {
     try {
@@ -338,9 +348,11 @@ module.exports = {
       if (index === -1) {
         if (["docx"].includes(format)) {
           getWordContent(url).then((res) => {
+            const userName = db.read().get('userInfo.name').value();
             editTabs.push({
               title: name,
               path: url,
+              user: userName,
               key,
             });
             dbMap
@@ -362,9 +374,11 @@ module.exports = {
           });
         } else if (["txt", "srt", "ass"].includes(format)) {
           getTxtContent(url, format).then((res) => {
+            const userName = db.read().get('userInfo.name').value();
             editTabs.push({
               title: name,
               path: url,
+              user: userName,
               key,
             });
             dbMap
@@ -399,10 +413,13 @@ module.exports = {
     } else {
       if (["docx"].includes(format)) {
         getWordContent(url).then((res) => {
+          const userName = db.read().get('userInfo.name').value();
           editTabs = [
             {
               title: name,
               key,
+              path: url,
+              user: userName,
             },
           ];
           dbMap
@@ -424,10 +441,13 @@ module.exports = {
         });
       } else if (["txt", "srt", "ass"].includes(format)) {
         getTxtContent(url, format).then((res) => {
+          const userName = db.read().get('userInfo.name').value();
           editTabs = [
             {
               title: name,
+              user: userName,
               key,
+              path: url,
             },
           ];
           dbMap

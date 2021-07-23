@@ -142,8 +142,9 @@ export default {
           this.$ipcRenderer.send('timer.refresh');
           this.openFile();
         } else {
-          // this.$notification.destroy();
+          this.$notification.close('notification');
           this.$notification.error({
+            key: 'notification',
             message: "提示",
             duration: 5,
             description: "请先登录后，进行操作",
@@ -197,7 +198,9 @@ export default {
         }
       } else {
         // this.$notification.destroy();
+        this.$notification.close('notification');
         this.$notification.error({
+          key: 'notification',
           message: "提示",
           duration: 5,
           description: "请先登录后，进行操作",
@@ -228,18 +231,21 @@ export default {
         .get("transform.tabs")
         .value();
       const key = new Date().getTime();
+      const userName = this.$db.read().get('userInfo.name').value();
       if (editTabs) {
         editTabs.forEach((item) => {
           item.isCurrent = false;
         });
         editTabs.push({
           title: `Untitled-${editTabs.length + 1}.txt`,
+          user: userName,
           key,
         });
       } else {
         editTabs = [
           {
             title: `Untitled-1.txt`,
+            user: userName,
             key,
           },
         ];
